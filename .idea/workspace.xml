@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="b56d6e9f-4f25-470b-a2c5-d6c0cac9c9ee" name="Changes" comment="feat(adaptive-dmm): 添加自适应多尺度特征提取与注视控制模块&#10;&#10;- 实现RegionExtractor，从360度图像提取注视点局部区域&#10;- 设计AdaptiveSphere_CNN，支持粗粒度全局与细粒度局部特征融合&#10;- 改写AdaptiveDMM，动态选择粗细特征提升序列模型表现&#10;- 增加AdaptiveGazeController，根据隐状态判断停止注视&#10;- 包含组件测试示例，验证各模块协同工作正确性" />
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="MarkdownSettingsMigration">
+    <option name="stateVersion" value="1" />
+  </component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 6
+}</component>
+  <component name="ProjectId" id="3A5yA403E19Q5wgs7TQwVZjo2VF" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
+    &quot;last_opened_file_path&quot;: &quot;E:/论文材料&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  }
+}</component>
+  <component name="SharedIndexes">
+    <attachedChunks>
+      <set>
+        <option value="bundled-python-sdk-c69650fc56ca-b11f5e8da5ad-com.jetbrains.pycharm.pro.sharedIndexes.bundled-PY-233.15619.17" />
+      </set>
+    </attachedChunks>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="b56d6e9f-4f25-470b-a2c5-d6c0cac9c9ee" name="Changes" comment="" />
+      <created>1771896578951</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1771896578951</updated>
+      <workItem from="1771896580009" duration="2372000" />
+      <workItem from="1771898976101" duration="599000" />
+      <workItem from="1771932786771" duration="1529000" />
+    </task>
+    <task id="LOCAL-00001" summary="feat(adaptive-dmm): 添加自适应多尺度特征提取与注视控制模块&#10;&#10;- 实现RegionExtractor，从360度图像提取注视点局部区域&#10;- 设计AdaptiveSphere_CNN，支持粗粒度全局与细粒度局部特征融合&#10;- 改写AdaptiveDMM，动态选择粗细特征提升序列模型表现&#10;- 增加AdaptiveGazeController，根据隐状态判断停止注视&#10;- 包含组件测试示例，验证各模块协同工作正确性">
+      <option name="closed" value="true" />
+      <created>1771897511324</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1771897511324</updated>
+    </task>
+    <task id="LOCAL-00002" summary="feat(adaptive-dmm): 添加自适应多尺度特征提取与注视控制模块&#10;&#10;- 实现RegionExtractor，从360度图像提取注视点局部区域&#10;- 设计AdaptiveSphere_CNN，支持粗粒度全局与细粒度局部特征融合&#10;- 改写AdaptiveDMM，动态选择粗细特征提升序列模型表现&#10;- 增加AdaptiveGazeController，根据隐状态判断停止注视&#10;- 包含组件测试示例，验证各模块协同工作正确性">
+      <option name="closed" value="true" />
+      <created>1771897626022</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1771897626022</updated>
+    </task>
+    <option name="localTasksCounter" value="3" />
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State>
+              <option name="FILTERS">
+                <map>
+                  <entry key="branch">
+                    <value>
+                      <list>
+                        <option value="main" />
+                      </list>
+                    </value>
+                  </entry>
+                </map>
+              </option>
+            </State>
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="feat(adaptive-dmm): 添加自适应多尺度特征提取与注视控制模块&#10;&#10;- 实现RegionExtractor，从360度图像提取注视点局部区域&#10;- 设计AdaptiveSphere_CNN，支持粗粒度全局与细粒度局部特征融合&#10;- 改写AdaptiveDMM，动态选择粗细特征提升序列模型表现&#10;- 增加AdaptiveGazeController，根据隐状态判断停止注视&#10;- 包含组件测试示例，验证各模块协同工作正确性" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat(adaptive-dmm): 添加自适应多尺度特征提取与注视控制模块&#10;&#10;- 实现RegionExtractor，从360度图像提取注视点局部区域&#10;- 设计AdaptiveSphere_CNN，支持粗粒度全局与细粒度局部特征融合&#10;- 改写AdaptiveDMM，动态选择粗细特征提升序列模型表现&#10;- 增加AdaptiveGazeController，根据隐状态判断停止注视&#10;- 包含组件测试示例，验证各模块协同工作正确性" />
+  </component>
+</project>

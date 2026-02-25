@@ -1,0 +1,22 @@
+{
+  "full": {
+    "params": 1935178,
+    "inference_ms": 48.093
+  },
+  "no_coord_att": {
+    "params": 1921794,
+    "inference_ms": 33.867
+  },
+  "no_hierarchical": {
+    "params": 1935178,
+    "inference_ms": 46.517
+  },
+  "no_coverage_loss": {
+    "params": 1935178,
+    "inference_ms": 46.975
+  },
+  "lstm_baseline": {
+    "params": 1655114,
+    "inference_ms": 47.802
+  }
+}
