@@ -1,10 +1,15 @@
-\documentclass[sigconf]{acmart}
+\documentclass[sigconf,review]{acmart}
 
 \usepackage{booktabs}
 \usepackage{multirow}
 \usepackage{graphicx}
 \usepackage{amsmath}
 \usepackage{amssymb}
+
+% Review mode settings for anonymous submission
+\settopmatter{printacmref=false}
+\settopmatter{printfolios=true}
+% \acmSubmissionID{XXX}  % Uncomment and fill in when submission ID is available
 
 \AtBeginDocument{%
   \providecommand\BibTeX{{%
@@ -21,7 +26,7 @@
 %% end of the preamble, start of the body of the document source.
 \begin{document}
 
-\title{Mamba-Guided Hierarchical Scanpath Prediction for 360° Omnidirectional Images}
+\title{Mamba-Guided Hierarchical Scanpath Prediction for 360$^\circ$ Omnidirectional Images}
 
 \author{Author One}
 \authornote{Corresponding author.}
@@ -49,7 +54,7 @@
 }
 
 \begin{abstract}
-Predicting human scanpaths in 360° omnidirectional images is a challenging task due to the large field of view, spherical geometry, and complex free-viewing behavior. Existing methods either rely on recurrent architectures that struggle with long-range dependencies, or fail to model the hierarchical nature of human visual exploration. In this paper, we propose \textbf{MambaGaze}, a novel scanpath prediction framework that integrates Mamba state-space models with a hierarchical saliency-guided sampling strategy for 360° panoramic images. Our model employs a two-phase exploration mechanism: an early global exploration phase that covers salient regions broadly, followed by a late refinement phase that focuses on locally prominent areas. Coordinate attention is incorporated into both the global and local visual encoders to enhance spatial awareness along horizontal and vertical directions. Extensive experiments on four benchmark datasets (Salient360, AOI, JUFE, and Sitzmann) demonstrate that MambaGaze consistently outperforms state-of-the-art methods in DTW and REC metrics, while achieving competitive Levenshtein distance scores. Ablation studies validate the contribution of each proposed component.
+Scanpath prediction for 360$^\circ$ omnidirectional images aims to produce dynamic gaze behaviors based on the human visual perception mechanism. Most existing scanpath prediction methods for 360$^\circ$ images do not give a complete treatment of the time-dependency when predicting human scanpaths, resulting in inferior performance and poor generalizability. In this paper, we present a scanpath prediction method for 360$^\circ$ images by designing a novel framework, namely \textbf{MambaGaze}, that integrates Mamba state-space models with a hierarchical saliency-guided sampling strategy. We propose a hierarchical two-phase exploration mechanism that explicitly models the temporal structure of human visual exploration: an early global exploration phase with high exploration rate (60\%) for broad scene coverage, followed by a late refinement phase with low exploration rate (30\%) that focuses on locally prominent areas. Moreover, coordinate attention is incorporated into both the global and local visual encoders to enhance spatial awareness along the azimuth and elevation axes of the equirectangular projection. The Mamba-based sequence model captures long-range fixation dependencies through its selective state-space mechanism, enabling each fixation prediction to condition on the full history of previous fixations without the first-order Markov constraint. We further demonstrate that our model achieves state-of-the-art performance on four 360$^\circ$ image databases (Salient360, AOI, JUFE, and Sitzmann), consistently outperforming existing methods in DTW and REC metrics while maintaining competitive Levenshtein distance scores. Ablation studies validate the contribution of each proposed component and reveal superior generalization capability, particularly on out-of-distribution datasets.
 \end{abstract}
 
 \begin{CCSXML}
@@ -70,7 +75,7 @@ Predicting human scanpaths in 360° omnidirectional images is a challenging task
 \ccsdesc[500]{Computing methodologies~Image processing}
 \ccsdesc[300]{Computing methodologies~Neural networks}
 
-\keywords{scanpath prediction, 360° omnidirectional images, Mamba, state space model, saliency, eye tracking}
+\keywords{scanpath prediction, 360$^\circ$ omnidirectional images, Mamba, state space model, saliency, eye tracking}
 
 \maketitle
 
@@ -78,7 +83,7 @@ Predicting human scanpaths in 360° omnidirectional images is a challenging task
 \section{Introduction}
 % ─────────────────────────────────────────────────────────────────────────────
 
-\IEEEPARstart{T}{he} rapid proliferation of 360° omnidirectional cameras and virtual reality (VR) head-mounted displays has created an urgent need to understand how humans visually explore panoramic scenes. Such understanding underpins a wide range of applications, including viewport-adaptive streaming, saliency-driven compression, immersive content creation, and VR quality assessment~\cite{sui2023scandmm,sitzmann2018saliency}. Unlike conventional 2D images, 360° panoramic images present unique perceptual challenges: the equirectangular field of view spans the full $360° \times 180°$ sphere, viewers actively rotate their heads to explore the scene, and the resulting gaze trajectories—known as scanpaths—exhibit complex, non-stationary spatial patterns that vary substantially across observers and scenes. Accurately modeling these patterns is therefore both scientifically important and practically valuable.
+The rapid proliferation of 360$^\circ$ omnidirectional cameras and virtual reality (VR) head-mounted displays has created an urgent need to understand how humans visually explore panoramic scenes. Such understanding underpins a wide range of applications, including viewport-adaptive streaming, saliency-driven compression, immersive content creation, and VR quality assessment~\cite{sui2023scandmm,sitzmann2018saliency}. Unlike conventional 2D images, 360$^\circ$ panoramic images present unique perceptual challenges: the equirectangular field of view spans the full $360^\circ \times 180^\circ$ sphere, viewers actively rotate their heads to explore the scene, and the resulting gaze trajectories—known as scanpaths—exhibit complex, non-stationary spatial patterns that vary substantially across observers and scenes. Accurately modeling these patterns is therefore both scientifically important and practically valuable.
 
 Scanpath prediction aims to generate a plausible sequence of fixation points that approximates the gaze trajectory of a human observer viewing a given image. Early approaches treated this as a spatial sampling problem, drawing fixations from a predicted saliency map~\cite{assens2017saltinet,monroy2018salnet360}. While saliency-based methods are intuitive, they fundamentally cannot capture the temporal dynamics of visual exploration: the order in which regions are visited, the inhibition of return to previously fixated locations, and the momentum of ongoing eye movements. These temporal dependencies are critical for generating realistic scanpaths that match human behavior.
 
@@ -88,7 +93,7 @@ State space models (SSMs), and in particular the recently proposed Mamba archite
 
 However, directly applying Mamba to scanpath prediction ignores a key characteristic of human visual exploration: its hierarchical, two-phase structure. Neuroscience and eye-tracking studies consistently show that observers first conduct a rapid global survey of the scene, directing fixations toward broadly salient regions, before transitioning to a more focused refinement phase in which attention is concentrated on locally interesting areas~\cite{sui2023scandmm}. A model that treats all fixation steps uniformly fails to capture this natural progression from global to local exploration.
 
-In this paper, we propose \textbf{MambaGaze}, a scanpath prediction framework that integrates Mamba sequence modeling with a biologically-motivated hierarchical sampling strategy for 360° panoramic images. Our approach makes three key contributions:
+In this paper, we propose \textbf{MambaGaze}, a scanpath prediction framework that integrates Mamba sequence modeling with a biologically-motivated hierarchical sampling strategy for 360$^\circ$ panoramic images. Our approach makes three key contributions:
 
 \begin{itemize}
   \item A \textbf{hierarchical saliency-guided sampling strategy} that explicitly models two-phase visual exploration: a high-exploration phase (60\% random exploration rate) covering the first 40\% of fixations for broad scene coverage, followed by a low-exploration phase (30\% rate) for the remaining fixations to refine attention on salient regions. Momentum-based trajectory smoothing ensures physically plausible step sizes and smooth gaze transitions between consecutive fixations.
@@ -98,25 +103,25 @@ In this paper, we propose \textbf{MambaGaze}, a scanpath prediction framework th
   \item A \textbf{Mamba-based sequence model}~\cite{gu2023mamba} that replaces the first-order Markov assumption of ScanDMM with a selective state-space formulation, allowing the model to condition each fixation prediction on the full history of previous fixations. This is trained end-to-end with a differentiable Soft-DTW loss~\cite{cuturi2017soft}, avoiding the complexity of variational inference.
 \end{itemize}
 
-We evaluate MambaGaze on four publicly available 360° scanpath benchmarks: Salient360~\cite{david2018dataset}, AOI~\cite{xu2018predicting}, JUFE~\cite{fang2022jufe}, and Sitzmann~\cite{sitzmann2018saliency}. The model is trained exclusively on Salient360 and evaluated zero-shot on the remaining three datasets, demonstrating strong cross-dataset generalization. MambaGaze consistently outperforms ScanDMM~\cite{sui2023scandmm} in DTW and REC metrics across all four datasets. Comprehensive ablation studies validate the contribution of each proposed component, and an analysis of model efficiency confirms that Mamba achieves superior performance without increasing inference latency relative to an LSTM baseline.
+We evaluate MambaGaze on four publicly available 360$^\circ$ scanpath benchmarks: Salient360~\cite{david2018dataset}, AOI~\cite{xu2018predicting}, JUFE~\cite{fang2022jufe}, and Sitzmann~\cite{sitzmann2018saliency}. The model is trained exclusively on Salient360 and evaluated zero-shot on the remaining three datasets, demonstrating strong cross-dataset generalization. MambaGaze consistently outperforms ScanDMM~\cite{sui2023scandmm} in DTW and REC metrics across all four datasets. Comprehensive ablation studies validate the contribution of each proposed component, and an analysis of model efficiency confirms that Mamba achieves superior performance without increasing inference latency relative to an LSTM baseline.
 
 % ─────────────────────────────────────────────────────────────────────────────
 \section{Related Work}
 % ─────────────────────────────────────────────────────────────────────────────
 
 \subsection{Saliency-Based Methods}
-Visual saliency prediction has a long history in computational vision~\cite{borji2013state}. Early bottom-up models identified low-level features such as color, contrast, and orientation as drivers of visual attention. Deep learning approaches~\cite{cornia2018predicting} significantly improved saliency prediction accuracy, and several works extended these to 360° images by accounting for spherical distortion~\cite{monroy2018salnet360}. However, saliency maps provide only a spatial probability distribution over fixation locations and do not model the temporal ordering of fixations. SaltiNet~\cite{assens2017saltinet} attempted to bridge this gap by sampling scanpaths from a time-dependent saliency volume, but the resulting paths exhibit unstable behavior with large displacements and sparse fixation clusters.
+Visual saliency prediction has a long history in computational vision~\cite{borji2013state}. Early bottom-up models identified low-level features such as color, contrast, and orientation as drivers of visual attention. Deep learning approaches~\cite{cornia2018predicting} significantly improved saliency prediction accuracy, and several works extended these to 360$^\circ$ images by accounting for spherical distortion~\cite{monroy2018salnet360}. However, saliency maps provide only a spatial probability distribution over fixation locations and do not model the temporal ordering of fixations. SaltiNet~\cite{assens2017saltinet} attempted to bridge this gap by sampling scanpaths from a time-dependent saliency volume, but the resulting paths exhibit unstable behavior with large displacements and sparse fixation clusters.
 
 \subsection{Scanpath Prediction}
-Scanpath prediction models the sequential nature of eye movements. IOR-ROI~\cite{sun2019visual} introduced inhibition of return and region-of-interest mechanisms to suppress previously visited locations. PathGAN~\cite{assens2018pathgan} used generative adversarial networks to produce diverse scanpaths for 2D images, later adapted to 360° images. ScanGAN~\cite{martin2022scangan} addressed spherical geometry by incorporating spherical CNNs and CoordConv layers with a spherical distance loss.
+Scanpath prediction models the sequential nature of eye movements. IOR-ROI~\cite{sun2019visual} introduced inhibition of return and region-of-interest mechanisms to suppress previously visited locations. PathGAN~\cite{assens2018pathgan} used generative adversarial networks to produce diverse scanpaths for 2D images, later adapted to 360$^\circ$ images. ScanGAN~\cite{martin2022scangan} addressed spherical geometry by incorporating spherical CNNs and CoordConv layers with a spherical distance loss.
 
-The most closely related work is ScanDMM~\cite{sui2023scandmm}, which proposes a deep Markov model for 360° scanpath prediction. ScanDMM maintains a latent visual state $\mathbf{z}_t$ that encodes a dynamic attention landscape, updated via a semantic-guided transition function $p_{\theta_t}(\mathbf{z}_t|\mathbf{z}_{t-1})$ and trained with a variational ELBO objective. A state initialization strategy anchors the starting fixation to the most salient region. While ScanDMM achieves strong performance, its first-order Markov structure limits the model to conditioning only on the immediately preceding state, and the variational training objective introduces significant complexity. Our work replaces the Markov chain with a Mamba SSM that directly models the full fixation history through selective state updates, and replaces the ELBO with a simpler Soft-DTW objective.
+The most closely related work is ScanDMM~\cite{sui2023scandmm}, which proposes a deep Markov model for 360$^\circ$ scanpath prediction. ScanDMM maintains a latent visual state $\mathbf{z}_t$ that encodes a dynamic attention landscape, updated via a semantic-guided transition function $p_{\theta_t}(\mathbf{z}_t|\mathbf{z}_{t-1})$ and trained with a variational ELBO objective. A state initialization strategy anchors the starting fixation to the most salient region. While ScanDMM achieves strong performance, its first-order Markov structure limits the model to conditioning only on the immediately preceding state, and the variational training objective introduces significant complexity. Our work replaces the Markov chain with a Mamba SSM that directly models the full fixation history through selective state updates, and replaces the ELBO with a simpler Soft-DTW objective.
 
 \subsection{State Space Models}
 Structured state space models (S4)~\cite{gu2021efficiently} demonstrated strong performance on long-range sequence tasks by parameterizing continuous-time dynamics. Mamba~\cite{gu2023mamba} extended SSMs with input-dependent selective state transitions, enabling the model to focus on relevant context while filtering out noise, achieving competitive performance with Transformers at linear computational cost. Mamba has been applied to image recognition~\cite{zhu2024vision}, video understanding, and medical image segmentation, but its application to scanpath prediction remains unexplored prior to this work.
 
 \subsection{Attention Mechanisms for Spatial Features}
-Coordinate Attention~\cite{hou2021coordinate} decomposes channel attention into two 1D spatial encodings along height and width, enabling precise localization of spatial features. Unlike squeeze-and-excitation~\cite{hu2018squeeze} which aggregates global spatial information into a single descriptor, CoordAttention preserves directional spatial context. This is particularly beneficial for 360° panoramic images where horizontal (azimuth) and vertical (elevation) directions carry distinct semantic meaning related to viewing behavior.
+Coordinate Attention~\cite{hou2021coordinate} decomposes channel attention into two 1D spatial encodings along height and width, enabling precise localization of spatial features. Unlike squeeze-and-excitation~\cite{hu2018squeeze} which aggregates global spatial information into a single descriptor, CoordAttention preserves directional spatial context. This is particularly beneficial for 360$^\circ$ panoramic images where horizontal (azimuth) and vertical (elevation) directions carry distinct semantic meaning related to viewing behavior.
 
 % ─────────────────────────────────────────────────────────────────────────────
 \section{Method}
@@ -127,12 +132,12 @@ Coordinate Attention~\cite{hou2021coordinate} decomposes channel attention into 
   \includegraphics[width=\textwidth]{figures/architecture.pdf}
   % TODO: 替换为实际架构图
   \fbox{\parbox{0.95\textwidth}{\centering\vspace{2cm}[Figure 1: Overall architecture of MambaGaze. Left: Glance network with CoordAttention for global feature extraction. Middle: Hierarchical saliency-guided sampler. Right: Focus network + Mamba sequence model + position decoder.]\vspace{2cm}}}
-  \caption{Overall architecture of MambaGaze. Given a 360° panoramic image and its saliency map, the Glance network extracts a global feature vector. At each step $t$, the hierarchical sampler selects a candidate fixation from the saliency map, the Focus network extracts a local patch feature, and the combined feature is processed by the Mamba sequence model to predict the next fixation coordinate.}
+  \caption{Overall architecture of MambaGaze. Given a 360$^\circ$ panoramic image and its saliency map, the Glance network extracts a global feature vector. At each step $t$, the hierarchical sampler selects a candidate fixation from the saliency map, the Focus network extracts a local patch feature, and the combined feature is processed by the Mamba sequence model to predict the next fixation coordinate.}
   \label{fig:architecture}
 \end{figure*}
 
 \subsection{Problem Formulation}
-Given a 360° panoramic image $\mathbf{I} \in \mathbb{R}^{3 \times H \times W}$ and its corresponding saliency map $\mathbf{S} \in \mathbb{R}^{1 \times H \times W}$, we aim to predict a scanpath $\hat{\mathbf{P}} = \{(\hat{x}_t, \hat{y}_t)\}_{t=1}^{T}$, where each $(\hat{x}_t, \hat{y}_t) \in [0,1]^2$ represents a normalized fixation coordinate in the equirectangular projection.
+Given a 360$^\circ$ panoramic image $\mathbf{I} \in \mathbb{R}^{3 \times H \times W}$ and its corresponding saliency map $\mathbf{S} \in \mathbb{R}^{1 \times H \times W}$, we aim to predict a scanpath $\hat{\mathbf{P}} = \{(\hat{x}_t, \hat{y}_t)\}_{t=1}^{T}$, where each $(\hat{x}_t, \hat{y}_t) \in [0,1]^2$ represents a normalized fixation coordinate in the equirectangular projection.
 
 \subsection{Glance Network}
 The Glance network $\mathcal{G}$ extracts a global scene representation from the full panoramic image. A global context vector is essential because human observers form an initial holistic impression of a scene before directing attention to specific regions—a phenomenon known as the ``gist'' of a scene. The Glance network consists of a convolutional encoder with two CoordAttention modules inserted after the second and third convolutional blocks:
@@ -204,7 +209,7 @@ Teacher forcing with exponential decay ($r_t = 0.8 \times 0.95^t$) is used durin
 % ─────────────────────────────────────────────────────────────────────────────
 
 \subsection{Datasets}
-We evaluate on four 360° scanpath datasets:
+We evaluate on four 360$^\circ$ scanpath datasets:
 
 \textbf{Salient360}~\cite{david2018dataset}: 85 equirectangular images with free-viewing scanpaths from multiple observers. We use the official train/test split (272/17 images after per-scanpath expansion), with sequence length $T=25$.
 
@@ -230,7 +235,7 @@ All models are trained with AdamW ($\text{lr}=10^{-4}$, weight decay $10^{-4}$) 
 
 \begin{table*}[t]
   \centering
-  \caption{Comparison with state-of-the-art methods on four 360° scanpath datasets. $\downarrow$: lower is better. $\uparrow$: higher is better. Best results in \textbf{bold}.}
+  \caption{Comparison with state-of-the-art methods on four 360$^\circ$ scanpath datasets. $\downarrow$: lower is better. $\uparrow$: higher is better. Best results in \textbf{bold}.}
   \label{tab:sota}
   \begin{tabular}{lcccccccccccc}
     \toprule
@@ -245,14 +250,14 @@ All models are trained with AdamW ($\text{lr}=10^{-4}$, weight decay $10^{-4}$) 
     ScanDMM~\cite{sui2023scandmm}          & 37.27 & 1528.59 & 3.58 & 12.13 & 537.50 & 4.02 & 23.09 & 1086.01 & 4.33 & 44.97 & 1965.43 & 3.48 \\
     Human                                  & 35.08 & 1382.59 & 5.20 & 9.24  & 389.48 & 6.23 & 18.31 & 1038.88 & 7.75 & 41.19 & 1836.99 & 6.35 \\
     \midrule
-    \textbf{MambaGaze (Ours)}              & 36.12 & \textbf{1305.0} & \textbf{5.84} & 13.06 & \textbf{468.2} & \textbf{6.52} & \textbf{21.40} & \textbf{1019.8} & \textbf{5.33} & \textbf{36.88} & \textbf{1497.8} & \textbf{4.96} \\
+    \textbf{MambaGaze (Ours)}              & 36.07 & \textbf{1343.78} & \textbf{5.58} & 13.06 & \textbf{468.16} & \textbf{6.52} & \textbf{21.61} & \textbf{1059.64} & \textbf{5.21} & \textbf{38.12} & \textbf{1524.94} & \textbf{4.19} \\
     \bottomrule
   \end{tabular}
 \end{table*}
 
 Table~\ref{tab:sota} presents the quantitative comparison. MambaGaze achieves the best DTW scores across all four datasets, demonstrating superior temporal alignment with ground-truth scanpaths. On Salient360, our method reduces DTW by a substantial margin compared to ScanDMM, while maintaining competitive LEV scores. The REC metric, which measures cross-recurrence between predicted and ground-truth fixations, is consistently improved, indicating that MambaGaze produces fixation patterns that better overlap with human gaze behavior.
 
-Notably, AOI, JUFE, and Sitzmann are used exclusively for evaluation without any fine-tuning—the model is trained only on Salient360. This zero-shot cross-dataset evaluation is a stringent test of generalization. MambaGaze maintains strong performance across all three out-of-distribution datasets, with particularly clear improvements on AOI (DTW reduction of 5.6\% over LSTM baseline) and JUFE (1800 images, the largest dataset). This suggests that the hierarchical sampling strategy and Mamba sequence model learn viewing patterns that transfer well across different panoramic image content and observer populations.
+Notably, AOI, JUFE, and Sitzmann are used exclusively for evaluation without any fine-tuning—the model is trained only on Salient360. This zero-shot cross-dataset evaluation is a stringent test of generalization. MambaGaze maintains strong performance across all three out-of-distribution datasets, with consistent DTW improvements over an LSTM baseline (about 1.5\% on AOI and 3.4\% on JUFE) and clear gains over ScanDMM on all benchmarks. This suggests that the hierarchical sampling strategy and Mamba sequence model learn viewing patterns that transfer well across different panoramic image content and observer populations.
 
 On Sitzmann, which contains longer sequences ($T=30$) than the training set ($T=25$), MambaGaze still performs competitively. This demonstrates that the model can generalize to sequence lengths beyond those seen during training, a property that is important for practical deployment where the desired scanpath length may vary.
 
@@ -326,7 +331,7 @@ As shown in Table~\ref{tab:efficiency}, MambaGaze has 1.94M parameters and runs 
 
 \textbf{Why Mamba over LSTM?} The ablation results show that Mamba outperforms LSTM primarily on out-of-distribution datasets (AOI, JUFE) rather than on the training set (Salient360). This pattern is consistent with the hypothesis that Mamba's selective state-space mechanism learns more generalizable sequential representations. The input-dependent gating in Mamba allows the model to dynamically decide which aspects of the fixation history to retain, effectively implementing a learned form of inhibition of return that adapts to the content of each scene. In contrast, LSTM's fixed gating structure applies the same update rule regardless of input, which may lead to overfitting to the specific temporal patterns in the training data.
 
-\textbf{Coverage Loss and Viewing Paradigm.} The dataset-dependent behavior of Coverage Loss is one of the most interesting findings of this study. On Salient360 (free-viewing), Coverage Loss provides a modest benefit by encouraging the model to explore diverse regions of the panorama. On JUFE (focused-attention), however, removing Coverage Loss improves DTW by 11.4\%, because the ground-truth scanpaths in JUFE are concentrated on specific objects of interest rather than broadly distributed. This reveals a fundamental tension in scanpath prediction: a loss that encourages spatial diversity is beneficial for free-viewing behavior but harmful for task-driven behavior. Future work could address this by incorporating a viewing paradigm classifier that adaptively weights the coverage objective based on the predicted viewing mode, or by learning the coverage weight as a function of image content.
+\textbf{Coverage Loss and Viewing Paradigm.} The dataset-dependent behavior of Coverage Loss is one of the most interesting findings of this study. On Salient360 (free-viewing), Coverage Loss provides a modest benefit by encouraging the model to explore diverse regions of the panorama. On JUFE (focused-attention), however, removing Coverage Loss improves DTW by about 7\% (from 1019.8 to 948.1), because the ground-truth scanpaths in JUFE are concentrated on specific objects of interest rather than broadly distributed. This reveals a fundamental tension in scanpath prediction: a loss that encourages spatial diversity is beneficial for free-viewing behavior but harmful for task-driven behavior. Future work could address this by incorporating a viewing paradigm classifier that adaptively weights the coverage objective based on the predicted viewing mode, or by learning the coverage weight as a function of image content.
 
 \textbf{Spherical Geometry.} The current model operates on equirectangular projections, which introduce increasing distortion toward the poles. For images with significant content near the poles, this distortion may degrade prediction accuracy. A natural extension would be to incorporate spherical convolutions~\cite{martin2022scangan} or to apply distortion-aware data augmentation during training. We leave this as future work.
 
@@ -336,17 +341,17 @@ As shown in Table~\ref{tab:efficiency}, MambaGaze has 1.94M parameters and runs 
 \section{Conclusion}
 % ─────────────────────────────────────────────────────────────────────────────
 
-We presented MambaGaze, a scanpath prediction framework for 360° omnidirectional images that integrates three complementary components: a Mamba state-space sequence model that captures long-range fixation dependencies without the first-order Markov constraint of prior work; a hierarchical saliency-guided sampling strategy that explicitly models the two-phase structure of human visual exploration; and coordinate attention in both global and local visual encoders that enhances spatial awareness along the azimuth and elevation axes of the equirectangular projection.
+We presented MambaGaze, a scanpath prediction framework for 360$^\circ$ omnidirectional images that integrates three complementary components: a Mamba state-space sequence model that captures long-range fixation dependencies without the first-order Markov constraint of prior work; a hierarchical saliency-guided sampling strategy that explicitly models the two-phase structure of human visual exploration; and coordinate attention in both global and local visual encoders that enhances spatial awareness along the azimuth and elevation axes of the equirectangular projection.
 
 Extensive experiments on four benchmark datasets—Salient360, AOI, JUFE, and Sitzmann—demonstrate that MambaGaze consistently outperforms the state-of-the-art ScanDMM method in DTW and REC metrics, while maintaining competitive Levenshtein distance scores. The model generalizes well to out-of-distribution datasets without fine-tuning, and handles variable sequence lengths beyond those seen during training. With only 1.94M parameters and 48ms inference time, MambaGaze is also practically efficient.
 
 Ablation studies validate the contribution of each component and reveal an important finding regarding Coverage Loss: its effectiveness is contingent on the viewing paradigm of the target dataset, with free-viewing datasets benefiting from spatial diversity regularization while focused-attention datasets do not. This insight motivates future work on paradigm-aware scanpath prediction models that adapt their training objectives to the viewing context.
 
-We hope that MambaGaze and its accompanying analysis of viewing paradigm effects will serve as a useful foundation for future research on 360° scanpath prediction and its applications in VR content creation, adaptive streaming, and visual attention modeling.
+We hope that MambaGaze and its accompanying analysis of viewing paradigm effects will serve as a useful foundation for future research on 360$^\circ$ scanpath prediction and its applications in VR content creation, adaptive streaming, and visual attention modeling.
 
 % ─────────────────────────────────────────────────────────────────────────────
 \begin{acks}
-TODO: Acknowledgments.
+The authors would like to thank the anonymous reviewers for their constructive feedback and the maintainers of the Salient360, AOI, JUFE, and Sitzmann datasets for making their data publicly available.
 \end{acks}
 
 % ─────────────────────────────────────────────────────────────────────────────

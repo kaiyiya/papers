@@ -4,8 +4,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="b56d6e9f-4f25-470b-a2c5-d6c0cac9c9ee" name="Changes" comment="feat(ablation): 增加完整消融实验框架及结果报告&#10;&#10;- 新增统一消融实验配置类AblationConfig，方便管理训练参数&#10;- 实现包含5个变体的消融模型AblationModel，支持full、no_coord_att、no_hierarchical、no_coverage_loss、lstm_baseline&#10;- 集成坐标注意力模块CoordAtt及相关网络结构GlanceNetwork和FocusNetwork&#10;- 实现分层采样器HierarchicalSampler及固定探索率采样器FixedRateSampler&#10;- 提供LSTM序列建模作为Mamba的替代方案&#10;- 输出完整的消融实验结果及多次训练测评，附详尽的性能对比指标&#10;- 新增消融实验结果Markdown报告，包含实验说明、结果表格及分析结论，支持论文撰写参考&#10;- 配置文件中新增.gitignore以忽略临时文件和环境配置文件&#10;- 代码模块导入结构完善，新增losses、metrics和data包的初始化文件">
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+    <list default="true" id="b56d6e9f-4f25-470b-a2c5-d6c0cac9c9ee" name="Changes" comment="feat(report): 生成V7.2模型详细评估及修正结果报告&#10;&#10;- 增加V7.2模型在多个数据集上的性能详尽评估报告&#10;- 提供修正后评估指标的比较与分析，揭示泛化能力差异&#10;- 包含关键Checkpoint性能趋势及模型版本迭代对比&#10;- 详细记录各数据集的核心指标、覆盖率及比例关系&#10;- 总结模型优缺点及改进建议，支持后续优化决策&#10;- 汇总所有数据集的可视化结果和性能统计数据">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -22,12 +22,16 @@
   &quot;associatedIndex&quot;: 6
 }</component>
   <component name="ProjectId" id="3A5yA403E19Q5wgs7TQwVZjo2VF" />
+  <component name="ProjectLevelVcsManager">
+    <ConfirmationsSetting value="2" id="Add" />
+  </component>
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
+    "ASKED_ADD_EXTERNAL_FILES": "true",
     "ASKED_SHARE_PROJECT_CONFIGURATION_FILES": "true",
     "RunOnceActivity.OpenProjectViewOnStart": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
@@ -61,7 +65,7 @@
       <workItem from="1771896580009" duration="2372000" />
       <workItem from="1771898976101" duration="599000" />
       <workItem from="1771932786771" duration="1529000" />
-      <workItem from="1772006632314" duration="433000" />
+      <workItem from="1772006632314" duration="1478000" />
     </task>
     <task id="LOCAL-00001" summary="feat(adaptive-dmm): 添加自适应多尺度特征提取与注视控制模块&#10;&#10;- 实现RegionExtractor，从360度图像提取注视点局部区域&#10;- 设计AdaptiveSphere_CNN，支持粗粒度全局与细粒度局部特征融合&#10;- 改写AdaptiveDMM，动态选择粗细特征提升序列模型表现&#10;- 增加AdaptiveGazeController，根据隐状态判断停止注视&#10;- 包含组件测试示例，验证各模块协同工作正确性">
       <option name="closed" value="true" />
@@ -87,7 +91,15 @@
       <option name="project" value="LOCAL" />
       <updated>1772006814656</updated>
     </task>
-    <option name="localTasksCounter" value="4" />
+    <task id="LOCAL-00004" summary="feat(report): 生成V7.2模型详细评估及修正结果报告&#10;&#10;- 增加V7.2模型在多个数据集上的性能详尽评估报告&#10;- 提供修正后评估指标的比较与分析，揭示泛化能力差异&#10;- 包含关键Checkpoint性能趋势及模型版本迭代对比&#10;- 详细记录各数据集的核心指标、覆盖率及比例关系&#10;- 总结模型优缺点及改进建议，支持后续优化决策&#10;- 汇总所有数据集的可视化结果和性能统计数据">
+      <option name="closed" value="true" />
+      <created>1772007492754</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1772007492754</updated>
+    </task>
+    <option name="localTasksCounter" value="5" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -120,8 +132,10 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
+    <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <MESSAGE value="feat(adaptive-dmm): 添加自适应多尺度特征提取与注视控制模块&#10;&#10;- 实现RegionExtractor，从360度图像提取注视点局部区域&#10;- 设计AdaptiveSphere_CNN，支持粗粒度全局与细粒度局部特征融合&#10;- 改写AdaptiveDMM，动态选择粗细特征提升序列模型表现&#10;- 增加AdaptiveGazeController，根据隐状态判断停止注视&#10;- 包含组件测试示例，验证各模块协同工作正确性" />
     <MESSAGE value="feat(ablation): 增加完整消融实验框架及结果报告&#10;&#10;- 新增统一消融实验配置类AblationConfig，方便管理训练参数&#10;- 实现包含5个变体的消融模型AblationModel，支持full、no_coord_att、no_hierarchical、no_coverage_loss、lstm_baseline&#10;- 集成坐标注意力模块CoordAtt及相关网络结构GlanceNetwork和FocusNetwork&#10;- 实现分层采样器HierarchicalSampler及固定探索率采样器FixedRateSampler&#10;- 提供LSTM序列建模作为Mamba的替代方案&#10;- 输出完整的消融实验结果及多次训练测评，附详尽的性能对比指标&#10;- 新增消融实验结果Markdown报告，包含实验说明、结果表格及分析结论，支持论文撰写参考&#10;- 配置文件中新增.gitignore以忽略临时文件和环境配置文件&#10;- 代码模块导入结构完善，新增losses、metrics和data包的初始化文件" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat(ablation): 增加完整消融实验框架及结果报告&#10;&#10;- 新增统一消融实验配置类AblationConfig，方便管理训练参数&#10;- 实现包含5个变体的消融模型AblationModel，支持full、no_coord_att、no_hierarchical、no_coverage_loss、lstm_baseline&#10;- 集成坐标注意力模块CoordAtt及相关网络结构GlanceNetwork和FocusNetwork&#10;- 实现分层采样器HierarchicalSampler及固定探索率采样器FixedRateSampler&#10;- 提供LSTM序列建模作为Mamba的替代方案&#10;- 输出完整的消融实验结果及多次训练测评，附详尽的性能对比指标&#10;- 新增消融实验结果Markdown报告，包含实验说明、结果表格及分析结论，支持论文撰写参考&#10;- 配置文件中新增.gitignore以忽略临时文件和环境配置文件&#10;- 代码模块导入结构完善，新增losses、metrics和data包的初始化文件" />
+    <MESSAGE value="feat(report): 生成V7.2模型详细评估及修正结果报告&#10;&#10;- 增加V7.2模型在多个数据集上的性能详尽评估报告&#10;- 提供修正后评估指标的比较与分析，揭示泛化能力差异&#10;- 包含关键Checkpoint性能趋势及模型版本迭代对比&#10;- 详细记录各数据集的核心指标、覆盖率及比例关系&#10;- 总结模型优缺点及改进建议，支持后续优化决策&#10;- 汇总所有数据集的可视化结果和性能统计数据" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat(report): 生成V7.2模型详细评估及修正结果报告&#10;&#10;- 增加V7.2模型在多个数据集上的性能详尽评估报告&#10;- 提供修正后评估指标的比较与分析，揭示泛化能力差异&#10;- 包含关键Checkpoint性能趋势及模型版本迭代对比&#10;- 详细记录各数据集的核心指标、覆盖率及比例关系&#10;- 总结模型优缺点及改进建议，支持后续优化决策&#10;- 汇总所有数据集的可视化结果和性能统计数据" />
   </component>
 </project>
