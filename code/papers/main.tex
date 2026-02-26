@@ -1,4 +1,5 @@
-\documentclass[sigconf,review]{acmart}
+% \documentclass[sigconf,review,anonymous]{acmart}
+\documentclass[sigconf]{acmart}
 
 \usepackage{booktabs}
 \usepackage{multirow}
@@ -6,21 +7,31 @@
 \usepackage{amsmath}
 \usepackage{amssymb}
 
-% Review mode settings for anonymous submission
+
 \settopmatter{printacmref=false}
 \settopmatter{printfolios=true}
-% \acmSubmissionID{XXX}  % Uncomment and fill in when submission ID is available
+% \acmSubmissionID{XXX}  
+
+
+\hypersetup{
+  pdfinfo={
+    Title={MambaGaze: Hierarchical Scanpath Prediction for 360° Images},
+  },
+  pdfauthor={},
+  pdfsubject={ACM MM 2026 Submission},
+}
+
 
 \AtBeginDocument{%
   \providecommand\BibTeX{{%
     Bib\TeX}}}
 
-\copyrightyear{2025}
-\acmYear{2025}
-\setcopyright{acmlicensed}
-\acmConference[MM '25]{Proceedings of the 33rd ACM International Conference on Multimedia}{October 27--31, 2025}{Dublin, Ireland}
+\copyrightyear{2026}
+\acmYear{2026}
+\setcopyright{none}
+\acmConference[MM '26]{Proceedings of the 34th ACM International Conference on Multimedia}{October 26--30, 2026}{Dublin, Ireland}
 \acmDOI{XXXXXXX.XXXXXXX}
-\acmISBN{978-1-4503-XXXX-X/25/10}
+\acmISBN{978-1-4503-XXXX-X/26/04}
 
 %%
 %% end of the preamble, start of the body of the document source.
@@ -28,29 +39,35 @@
 
 \title{Mamba-Guided Hierarchical Scanpath Prediction for 360$^\circ$ Omnidirectional Images}
 
-\author{Author One}
-\authornote{Corresponding author.}
+\author{Linlin Zhong}
 \email{author1@university.edu}
 \affiliation{%
-  \institution{University Name}
-  \city{City}
-  \country{Country}
+  \institution{East China Normal University}
+  \streetaddress{School of Computer Science and Technology}
+  \city{Shanghai}
+  \postcode{200333}
+  \country{China}
 }
 
-\author{Author Two}
+\author{Dandan Zhu}
+\authornote{Corresponding author.}
 \email{author2@university.edu}
 \affiliation{%
-  \institution{University Name}
-  \city{City}
-  \country{Country}
+  \institution{East China Normal University}
+  \streetaddress{School of Computer Science and Technology}
+  \city{Shanghai}
+  \postcode{200333}
+  \country{China}
 }
 
-\author{Author Three}
+\author{Xiaohui Kong}
 \email{author3@university.edu}
 \affiliation{%
-  \institution{University Name}
-  \city{City}
-  \country{Country}
+  \institution{East China Normal University}
+  \streetaddress{School of Computer Science and Technology}
+  \city{Shanghai}
+  \postcode{200333}
+  \country{China}
 }
 
 \begin{abstract}
@@ -75,7 +92,7 @@ Scanpath prediction for 360$^\circ$ omnidirectional images aims to produce dynam
 \ccsdesc[500]{Computing methodologies~Image processing}
 \ccsdesc[300]{Computing methodologies~Neural networks}
 
-\keywords{scanpath prediction, 360$^\circ$ omnidirectional images, Mamba, state space model, saliency, eye tracking}
+\keywords{scanpath prediction, 360$^\circ$ omnidirectional images, Mamba, hierarchical sampling, coordinate attention, saliency, eye tracking}
 
 \maketitle
 
