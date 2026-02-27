@@ -5,7 +5,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b56d6e9f-4f25-470b-a2c5-d6c0cac9c9ee" name="Changes" comment="feat(report): 生成V7.2模型详细评估及修正结果报告&#10;&#10;- 增加V7.2模型在多个数据集上的性能详尽评估报告&#10;- 提供修正后评估指标的比较与分析，揭示泛化能力差异&#10;- 包含关键Checkpoint性能趋势及模型版本迭代对比&#10;- 详细记录各数据集的核心指标、覆盖率及比例关系&#10;- 总结模型优缺点及改进建议，支持后续优化决策&#10;- 汇总所有数据集的可视化结果和性能统计数据">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/code/papers/main.tex" beforeDir="false" afterPath="$PROJECT_DIR$/code/papers/main.tex" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -29,24 +29,24 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "ASKED_ADD_EXTERNAL_FILES": "true",
-    "ASKED_SHARE_PROJECT_CONFIGURATION_FILES": "true",
-    "RunOnceActivity.OpenProjectViewOnStart": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
-    "git-widget-placeholder": "main",
-    "last_opened_file_path": "E:/论文材料",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "settings.editor.selected.configurable": "preferences.pluginManager",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;ASKED_ADD_EXTERNAL_FILES&quot;: &quot;true&quot;,
+    &quot;ASKED_SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
+    &quot;last_opened_file_path&quot;: &quot;E:/论文材料&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.pluginManager&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
@@ -66,6 +66,7 @@
       <workItem from="1771898976101" duration="599000" />
       <workItem from="1771932786771" duration="1529000" />
       <workItem from="1772006632314" duration="1478000" />
+      <workItem from="1772156193273" duration="36000" />
     </task>
     <task id="LOCAL-00001" summary="feat(adaptive-dmm): 添加自适应多尺度特征提取与注视控制模块&#10;&#10;- 实现RegionExtractor，从360度图像提取注视点局部区域&#10;- 设计AdaptiveSphere_CNN，支持粗粒度全局与细粒度局部特征融合&#10;- 改写AdaptiveDMM，动态选择粗细特征提升序列模型表现&#10;- 增加AdaptiveGazeController，根据隐状态判断停止注视&#10;- 包含组件测试示例，验证各模块协同工作正确性">
       <option name="closed" value="true" />
