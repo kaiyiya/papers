@@ -40,7 +40,7 @@
 \title{HSM: Hierarchical Scanpath Mamba for 360$^\circ$ Omnidirectional Images}
 
 \author{Linlin Zhong}
-\email{author1@university.edu}
+% \email{author1@university.edu}
 \affiliation{%
   \institution{East China Normal University}
   \streetaddress{School of Computer Science and Technology}
@@ -51,7 +51,7 @@
 
 \author{Dandan Zhu}
 \authornote{Corresponding author.}
-\email{author2@university.edu}
+% \email{author2@university.edu}
 \affiliation{%
   \institution{East China Normal University}
   \streetaddress{School of Computer Science and Technology}
@@ -61,7 +61,7 @@
 }
 
 \author{Xiaohui Kong}
-\email{author3@university.edu}
+% \email{author3@university.edu}
 \affiliation{%
   \institution{East China Normal University}
   \streetaddress{School of Computer Science and Technology}
@@ -264,18 +264,19 @@ All models are trained with AdamW ($\text{lr}=10^{-4}$, weight decay $10^{-4}$) 
     \cmidrule(lr){2-4}\cmidrule(lr){5-7}\cmidrule(lr){8-10}\cmidrule(lr){11-13}
     Method & LEV$\downarrow$ & DTW$\downarrow$ & REC$\uparrow$ & LEV$\downarrow$ & DTW$\downarrow$ & REC$\uparrow$ & LEV$\downarrow$ & DTW$\downarrow$ & REC$\uparrow$ & LEV$\downarrow$ & DTW$\downarrow$ & REC$\uparrow$ \\
     \midrule
-    PathGAN       & -- & -- & -- & -- & -- & -- & -- & -- & -- & -- & -- & -- \\
-    SaltiNet     & 40.85 & 1855.48 & 2.31 & 14.70 & 596.54 & 2.24 & 26.07 & 1287.14 & 1.54 & 51.37 & 2305.10 & 1.56 \\
+    CLE           & 39.77 & 1714.41 & 3.32 & 12.87 & 547.89 & 3.62 & 24.84 & 1172.15 & 3.01 & 45.18 & 1967.29 & 3.13 \\
+    DeepGazeIII   & 40.01 & 1742.35 & 2.59 & 13.16 & 558.45 & 2.89 & 24.13 & 1104.85 & 2.77 & 46.42 & 1992.86 & 3.08 \\
+    SaltiNet      & 40.85 & 1855.48 & 2.31 & 14.70 & 596.54 & 2.24 & 26.07 & 1287.14 & 1.54 & 51.37 & 2305.10 & 1.56 \\
     ScanGAN       & 38.93 & 1721.71 & 3.10 & 12.89 & 552.45 & 3.75 & 24.21 & 1094.98 & 3.08 & 45.27 & 1951.85 & 3.24 \\
-    ScanDMM          & 37.27 & 1528.59 & 3.58 & 12.13 & 537.50 & 4.02 & 23.09 & 1086.01 & 4.33 & 44.97 & 1965.43 & 3.48 \\
-    Human                                  & 35.08 & 1382.59 & 5.20 & 9.24  & 389.48 & 6.23 & 18.31 & 1038.88 & 7.75 & 41.19 & 1836.99 & 6.35 \\
+    ScanDMM       & 37.27 & 1528.59 & 3.58 & 12.13 & 537.50 & 4.02 & 23.09 & 1086.01 & 4.33 & 44.97 & 1965.43 & 3.48 \\
+    Human         & 35.08 & 1382.59 & 5.20 & 9.24  & 389.48 & 6.23 & 18.31 & 1038.88 & 7.75 & 41.19 & 1836.99 & 6.35 \\
     \midrule
-    \textbf{HSM (Ours)}                    & 36.07 & \textbf{1343.78} & \textbf{5.58} & 13.06 & \textbf{468.16} & \textbf{6.52} & \textbf{21.61} & \textbf{1059.64} & \textbf{5.21} & \textbf{38.12} & \textbf{1524.94} & \textbf{4.19} \\
+    \textbf{HSM (Ours)} & 36.07 & \textbf{1343.78} & \textbf{5.58} & 13.06 & \textbf{468.16} & \textbf{6.52} & \textbf{21.61} & \textbf{1059.64} & \textbf{5.21} & \textbf{38.12} & \textbf{1524.94} & \textbf{4.19} \\
     \bottomrule
   \end{tabular}
 \end{table*}
 
-Table~\ref{tab:sota} presents the quantitative comparison. HSM attains the lowest DTW scores across all four datasets, indicating strong temporal alignment with ground-truth scanpaths, and achieves the highest REC on all benchmarks. On Levenshtein distance, HSM outperforms all baselines on Salient360, JUFE, and Sitzmann, though it is slightly behind ScanDMM on AOI (13.06 vs.\ 12.13). On Salient360, HSM achieves substantially lower DTW than existing saliency-based and generative approaches, and closes the gap to human performance on all three metrics.
+Table~\ref{tab:sota} presents the quantitative comparison across a diverse set of baselines, including traditional scanpath models (CLE), deep 2D scanpath predictors adapted to 360$^\circ$ images (DeepGazeIII), saliency-based methods (SaltiNet), and 360$^\circ$ generative models (ScanGAN and ScanDMM), as well as the human upper bound. HSM attains the lowest DTW scores across all four datasets, indicating strong temporal alignment with ground-truth scanpaths, and achieves the highest REC on all benchmarks. On Levenshtein distance, HSM outperforms all baselines on Salient360, JUFE, and Sitzmann, though it is slightly behind ScanDMM on AOI (13.06 vs.\ 12.13). On Salient360, HSM achieves substantially lower DTW than existing saliency-based and generative approaches, and closes the gap to human performance on all three metrics.
 
 AOI, JUFE, and Sitzmann are used exclusively for zero-shot evaluation without any fine-tuning. HSM maintains strong performance across all three out-of-distribution datasets, with clear DTW improvements over the LSTM baseline (approximately 1.5\% on AOI and 3.4\% on JUFE) and consistently favorable REC. This suggests that the hierarchical sampling strategy and Mamba sequence model learn viewing patterns that transfer well across different panoramic image content and observer populations.
 
@@ -304,7 +305,6 @@ The qualitative comparison in Figure~\ref{fig:qualitative} illustrates that HSM 
     \cmidrule(lr){2-3}\cmidrule(lr){4-5}
     Variant & LEV$\downarrow$ & DTW$\downarrow$ & LEV$\downarrow$ & DTW$\downarrow$ \\
     \midrule
-    % TODO: 替换为3次run的mean±std结果
     Full model          & $36.12_{\pm 0.33}$ & $1305.0_{\pm 16.9}$ & $21.40_{\pm 0.45}$ & $1019.8_{\pm 19.1}$ \\
     w/o CoordAtt        & $36.45_{\pm 0.31}$ & $1344.5_{\pm  8.9}$ & $22.55_{\pm 0.95}$ & $1044.7_{\pm 10.8}$ \\
     w/o Hier. Sampling  & $35.95_{\pm 0.19}$ & $1320.5_{\pm 21.9}$ & $22.26_{\pm 0.51}$ & $1019.3_{\pm 34.1}$ \\
@@ -318,7 +318,7 @@ Table~\ref{tab:ablation} presents the ablation results. We analyze each componen
 
 \textbf{Effect of Mamba vs. LSTM.} Replacing Mamba with an LSTM of comparable size degrades DTW by 1.5\% on AOI and 3.5\% on JUFE, confirming that Mamba's selective state-space mechanism better captures long-range fixation dependencies. Notably, LSTM achieves slightly lower DTW on Salient360 (the training set), while Mamba generalizes better to unseen datasets, suggesting that the selective scan mechanism learns more transferable sequential patterns.
 
-\textbf{Effect of Hierarchical Sampling.} Replacing the two-phase exploration with a fixed exploration rate of 0.45 consistently degrades LEV across datasets. The degradation is most pronounced on JUFE (LEV $+0.86$, DTW $+0.5$), which has longer sequences where the temporal structure of exploration matters most.
+\textbf{Effect of Hierarchical Sampling.} Replacing the two-phase exploration with a fixed exploration rate of 0.45 consistently degrades LEV across datasets. The degradation is most pronounced on JUFE (LEV $+0.86$), while DTW on JUFE remains nearly unchanged (1019.3 vs.\ 1019.8), suggesting that hierarchical sampling primarily improves fixation sequence ordering rather than spatial proximity.
 
 \textbf{Effect of CoordAttention.} Removing CoordAttention leads to consistent performance degradation across all datasets, with the largest effect on Sitzmann (DTW $+66.8$) and JUFE (LEV $+1.15$). The benefit is more pronounced on high-resolution wide-aspect-ratio images where horizontal spatial relationships are more informative.
 
@@ -338,12 +338,12 @@ Table~\ref{tab:ablation} presents the ablation results. We analyze each componen
     w/o CoordAtt            & 1,921,794 & 33.87 \\
     w/o Hier. Sampling      & 1,935,178 & 46.52 \\
     w/o Coverage Loss       & 1,935,178 & 46.97 \\
-    LSTM baseline           & 1,655,178 & 47.80 \\
+    LSTM baseline           & 1,655,114 & 47.80 \\
     \bottomrule
   \end{tabular}
 \end{table}
 
-As shown in Table~\ref{tab:efficiency}, HSM has 1.94M parameters and runs at 48ms per inference. Despite having 17\% more parameters than the LSTM baseline (1.66M), the inference time is comparable (48ms vs. 48ms), demonstrating that Mamba's linear-complexity selective scan does not introduce additional latency over LSTM at this sequence length. CoordAttention adds approximately 14ms of overhead due to its pooling operations.
+As shown in Table~\ref{tab:efficiency}, HSM has 1.94M parameters and runs at 48ms per inference. Despite having 17\% more parameters than the LSTM baseline (1.66M), the inference time is comparable (48ms vs.\ 48ms), demonstrating that Mamba's linear-complexity selective scan does not introduce additional latency over LSTM at this sequence length. Removing CoordAttention reduces inference time by approximately 14ms, confirming that the pooling operations in CoordAttention account for most of the overhead.
 
 % ─────────────────────────────────────────────────────────────────────────────
 \section{Discussion}
