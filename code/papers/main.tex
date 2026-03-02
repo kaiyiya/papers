@@ -36,7 +36,7 @@
 
 \begin{document}
 
-\title{HSM: Hierarchical Scanpath Mamba for 360$^\circ$ Omnidirectional Images}
+\title{HSM: Hierarchical Scanpath Mamba for 360\texorpdfstring{$^\circ$}{ degrees} Omnidirectional Images}
 
 \author{Linlin Zhong}
 % \email{author1@university.edu}
@@ -122,12 +122,12 @@ We evaluate HSM on four publicly available 360$^\circ$ scanpath benchmarks: Sali
 % ─────────────────────────────────────────────────────────────────────────────
 
 \subsection{Saliency-Based Methods}
-Visual saliency prediction has a long history in computational vision. Early bottom-up models identified low-level features such as color, contrast, and orientation as drivers of visual attention. Deep learning approaches significantly improved saliency prediction accuracy, and several works extended these to 360$^\circ$ images by accounting for spherical distortion. However, saliency maps provide only a spatial probability distribution over fixation locations and do not model the temporal ordering of fixations. SaltiNet attempted to bridge this gap by sampling scanpaths from a time-dependent saliency volume, but the resulting paths exhibit unstable behavior with large displacements and sparse fixation clusters.
+Visual saliency prediction has a long history in computational vision, from early bottom-up models based on low-level features such as color, contrast, and orientation~\cite{itti1998saliency} to deep learning based saliency detectors~\cite{li2016deepcontrast,wang2017salientobject}. Several works extended 2D saliency models to 360$^\circ$ images by accounting for spherical distortion, e.g., GBVS360, BMS360, and ProSal~\cite{lebreton2018gbvs360}, SalNet360~\cite{monroy2018salnet360}, and SalGAN360~\cite{chao2018salgan360}, as well as graph-based spherical architectures such as SalGCN and SalBiNet360~\cite{lv2020salgcn,chen2020salbinet360}. However, saliency maps provide only a spatial probability distribution over fixation locations and do not model the temporal ordering of fixations. SaltiNet~\cite{assens2017saltinet} attempted to bridge this gap by sampling scanpaths from a time-dependent saliency volume, but the resulting paths exhibit unstable behavior with large displacements and sparse fixation clusters.
 
 Beyond static 2D content, recent work on 360$^\circ$ video has explored audio-visual saliency prediction with spherical vision Transformers. These models operate on tangent-plane views sampled from the viewing sphere and use geometry-aware positional encodings to mitigate the distortion introduced by equirectangular or cube-map projections. By integrating spatial audio cues through lightweight adapter modules on top of a frozen visual backbone, they demonstrate that jointly modeling spherical geometry and multi-modal signals substantially improves attention prediction in immersive environments. Although these approaches predict saliency maps rather than scanpaths, they highlight the benefits of geometry-aware transformer backbones and audio-visual fusion for 360$^\circ$ attention modeling, and provide a complementary line of research to our scanpath-focused framework.
 
 \subsection{Scanpath Prediction}
-Scanpath prediction models the sequential nature of eye movements. IOR-ROI introduced inhibition of return and region-of-interest mechanisms to suppress previously visited locations. PathGAN used generative adversarial networks to produce diverse scanpaths for 2D images, later adapted to 360$^\circ$ images. ScanGAN addressed spherical geometry by incorporating spherical CNNs and CoordConv layers with a spherical distance loss.
+Scanpath prediction models the sequential nature of eye movements. Classical models have explored probabilistic gaze dynamics and saccadic decision processes~\cite{boccignone2004randomwalk,wolfe2021guidedsearch,zanca2020gravitational}. Deep learning based methods include IOR-ROI recurrent mixture density networks~\cite{sun2021iorroi}, RNN-based scanpath generators such as ScanpathNet~\cite{debelan2022scanpathnet}, and models like DeepGaze~III~\cite{kummerer2022deepgazeIII} that unify fixation and scanpath prediction~\cite{kummerer2021sota}. PathGAN used generative adversarial networks to produce diverse scanpaths for 2D images and was extended to 360$^\circ$ content, while ScanGAN360 explicitly addresses spherical geometry with spherical CNNs and CoordConv layers combined with a spherical distance loss~\cite{martin2022scangan}.
 
 The most closely related prior work is ScanDMM~\cite{sui2023scandmm}, which proposes a deep Markov model for 360$^\circ$ scanpath prediction. ScanDMM maintains a latent visual state $\mathbf{z}_t$ that encodes a dynamic attention landscape, updated via a semantic-guided transition function $p_{\theta_t}(\mathbf{z}_t|\mathbf{z}_{t-1})$ and trained with a variational ELBO objective. A state initialization strategy anchors the starting fixation to the most salient region. While ScanDMM achieves strong performance, its first-order Markov structure limits the model to conditioning only on the immediately preceding state, and the variational training objective introduces significant complexity.
 
@@ -146,6 +146,7 @@ Coordinate Attention decomposes channel attention into two 1D spatial encodings 
 \begin{figure*}[t]
   \centering
   \includegraphics[width=\textwidth]{figures/architecture.pdf}
+  \Description{Overall architecture diagram of the proposed HSM model, showing the Glance network, hierarchical sampler, Focus network, and Mamba sequence model.}
   \caption{Overall architecture of HSM. Given a 360$^\circ$ panoramic image and its saliency map, the Glance network extracts a global feature vector. At each step $t$, the hierarchical sampler selects a candidate fixation from the saliency map, the Focus network extracts a local patch feature, and the combined feature is processed by the Mamba sequence model to predict the next fixation coordinate.}
   \label{fig:architecture}
 \end{figure*}
@@ -160,6 +161,7 @@ The Glance network $\mathcal{G}$ extracts a global scene representation from the
 \begin{figure}[t]
   \centering
   \includegraphics[width=0.9\linewidth]{figures/coordatt.pdf}
+  \Description{Illustration of the CoordAttention module with separate height and width pooling branches and resulting attention weights.}
   \caption{Illustration of the CoordAttention module. The feature map is pooled along the height ($\leftrightarrow$, azimuth) and width ($\updownarrow$, elevation) axes independently, projected through a shared Conv1$\times$1, then split to produce per-direction attention weights $a_h$ and $a_w$.}
   \label{fig:coordatt}
 \end{figure}
@@ -184,6 +186,7 @@ Human visual exploration follows a well-documented hierarchical pattern: early f
 \begin{figure}[t]
   \centering
   \includegraphics[width=\linewidth]{figures/sampler.pdf}
+  \Description{Diagram of the hierarchical saliency-guided sampler, with an early high-exploration phase and a later low-exploration refinement phase.}
   \caption{Illustration of the hierarchical saliency-guided sampling strategy. In Phase~1 ($t < 0.4T$, $\epsilon=0.60$), fixations spread broadly across the panorama. In Phase~2 ($t \geq 0.4T$, $\epsilon=0.30$), sampling concentrates on high-saliency regions. Momentum smoothing produces physically plausible gaze transitions between consecutive fixations.}
   \label{fig:sampler}
 \end{figure}
@@ -258,6 +261,8 @@ We adopt three standard scanpath metrics:
 
 \textbf{Recurrence Rate (REC)}: Cross-recurrence between predicted and ground-truth fixations within a 12-pixel threshold. Higher is better.
 
+These sequence-based metrics are widely used to assess scanpath similarity and saliency models~\cite{fahimi2021scanpathmetrics,bylinskii2019metrics,kummerer2015infotheoretic}.
+
 \subsection{Implementation Details}
 All models are trained with AdamW ($\text{lr}=10^{-4}$, weight decay $10^{-4}$) for 50 epochs with cosine annealing. Batch size is 128. Images are resized to $128 \times 256$. Training uses the Salient360 training split only; all other datasets are used for evaluation without fine-tuning. All experiments are run on a single NVIDIA GPU.
 
@@ -285,7 +290,7 @@ All models are trained with AdamW ($\text{lr}=10^{-4}$, weight decay $10^{-4}$) 
   \end{tabular}
 \end{table*}
 
-Table~\ref{tab:sota} presents the quantitative comparison across a diverse set of baselines, including traditional scanpath models (CLE), deep 2D scanpath predictors adapted to 360$^\circ$ images (DeepGazeIII), saliency-based methods (SaltiNet), and 360$^\circ$ generative models (ScanGAN and ScanDMM), as well as the human upper bound. HSM attains the lowest DTW scores across all four datasets, indicating strong temporal alignment with ground-truth scanpaths, and achieves the highest REC on all benchmarks. On Levenshtein distance, HSM outperforms all baselines on Salient360, JUFE, and Sitzmann, though it is slightly behind ScanDMM on AOI (13.06 vs.\ 12.13). On Salient360, HSM achieves substantially lower DTW than existing saliency-based and generative approaches, and closes the gap to human performance on all three metrics.
+Table~\ref{tab:sota} presents the quantitative comparison across a diverse set of baselines, including traditional scanpath models (CLE), deep 2D scanpath predictors adapted to 360$^\circ$ images (DeepGazeIII~\cite{kummerer2022deepgazeIII}), saliency-based methods (SaltiNet~\cite{assens2017saltinet}), and 360$^\circ$ generative or probabilistic models (ScanGAN360~\cite{martin2022scangan}, ScanDMM~\cite{sui2023scandmm}, and Pathformer3D~\cite{quan2024pathformer3d}), as well as the human upper bound. HSM attains the lowest DTW scores across all four datasets, indicating strong temporal alignment with ground-truth scanpaths, and achieves the highest REC on all benchmarks. On Levenshtein distance, HSM outperforms all baselines on Salient360, JUFE, and Sitzmann, though it is slightly behind ScanDMM on AOI (13.06 vs.\ 12.13). On Salient360, HSM achieves substantially lower DTW than existing saliency-based and generative approaches, and closes the gap to human performance on all three metrics.
 
 AOI, JUFE, and Sitzmann are used exclusively for zero-shot evaluation without any fine-tuning. HSM maintains strong performance across all three out-of-distribution datasets, with clear DTW improvements over the LSTM baseline (approximately 1.5\% on AOI and 3.4\% on JUFE) and consistently favorable REC. This suggests that the hierarchical sampling strategy and Mamba sequence model learn viewing patterns that transfer well across different panoramic image content and observer populations.
 
@@ -297,6 +302,7 @@ The qualitative comparison in Figure~\ref{fig:qualitative} illustrates that HSM 
   \centering
   % TODO: 替换为实际可视化图
   \fbox{\parbox{0.45\textwidth}{\centering\vspace{3cm}[Figure 2: Qualitative comparison of predicted scanpaths. Top row: a strong baseline (e.g., ScanDMM). Bottom row: HSM (Ours). Rainbow color indicates temporal order (blue=early, red=late).]\vspace{3cm}}}
+  \Description{Placeholder panel showing qualitative comparison of predicted scanpaths between a baseline model and HSM on Salient360 and JUFE images.}
   \caption{Qualitative comparison of predicted scanpaths on Salient360 (left) and JUFE (right). HSM produces scanpaths that align well with ground-truth viewing patterns while covering salient regions more systematically.}
   \label{fig:qualitative}
 \end{figure}
@@ -328,6 +334,7 @@ Table~\ref{tab:ablation} presents the ablation results. We analyze each componen
 \begin{figure}[t]
   \centering
   \includegraphics[width=\linewidth]{figures/ablation.pdf}
+  \Description{Bar plot summarizing ablation study results across datasets and metrics for different HSM variants.}
   \caption{Ablation study results across all four datasets and three metrics. Each group of bars corresponds to one model variant (mean $\pm$ std over 3 runs). * marks the best-performing variant per dataset--metric combination.}
   \label{fig:ablation}
 \end{figure}
