@@ -5,17 +5,18 @@
 \usepackage{multirow}
 \usepackage{graphicx}
 \usepackage{amsmath}
+\let\Bbbk\relax  % 解决 \Bbbk 命令冲突
 \usepackage{amssymb}
 
 
-\settopmatter{printacmref=false}
+\settopmatter{printacmref=true}
 \settopmatter{printfolios=true}
 % \acmSubmissionID{XXX}  
 
 
 \hypersetup{
   pdfinfo={
-    Title={HSM: Hierarchical Scanpath Mamba for 360° Omnidirectional Images},
+    Title={HSM: Hierarchical Scanpath Mamba for 360 degrees Omnidirectional Images},
   },
   pdfauthor={},
   pdfsubject={ACM MM 2026 Submission},
@@ -33,8 +34,6 @@
 \acmDOI{XXXXXXX.XXXXXXX}
 \acmISBN{978-1-4503-XXXX-X/26/04}
 
-%%
-%% end of the preamble, start of the body of the document source.
 \begin{document}
 
 \title{HSM: Hierarchical Scanpath Mamba for 360$^\circ$ Omnidirectional Images}
@@ -43,9 +42,7 @@
 % \email{author1@university.edu}
 \affiliation{%
   \institution{East China Normal University}
-  \streetaddress{School of Computer Science and Technology}
   \city{Shanghai}
-  \postcode{200333}
   \country{China}
 }
 
@@ -54,9 +51,7 @@
 % \email{author2@university.edu}
 \affiliation{%
   \institution{East China Normal University}
-  \streetaddress{School of Computer Science and Technology}
   \city{Shanghai}
-  \postcode{200333}
   \country{China}
 }
 
@@ -64,9 +59,7 @@
 % \email{author3@university.edu}
 \affiliation{%
   \institution{East China Normal University}
-  \streetaddress{School of Computer Science and Technology}
   \city{Shanghai}
-  \postcode{200333}
   \country{China}
 }
 
@@ -92,7 +85,7 @@ Scanpath prediction for 360$^\circ$ omnidirectional images aims to generate dyna
 \ccsdesc[500]{Computing methodologies~Image processing}
 \ccsdesc[300]{Computing methodologies~Neural networks}
 
-\keywords{scanpath prediction, 360$^\circ$ omnidirectional images, Mamba, hierarchical sampling, coordinate attention, saliency, eye tracking}
+\keywords{scanpath prediction, 360 degrees omnidirectional images, Mamba, hierarchical sampling, coordinate attention, saliency, eye tracking}
 
 \maketitle
 
@@ -153,8 +146,6 @@ Coordinate Attention decomposes channel attention into two 1D spatial encodings 
 \begin{figure*}[t]
   \centering
   \includegraphics[width=\textwidth]{figures/architecture.pdf}
-  % TODO: 替换为实际架构图
-  \fbox{\parbox{0.95\textwidth}{\centering\vspace{2cm}[Figure 1: Overall architecture of HSM. Left: Glance network with CoordAttention for global feature extraction. Middle: hierarchical saliency-guided sampler. Right: Focus network + Mamba sequence model + position decoder.]\vspace{2cm}}}
   \caption{Overall architecture of HSM. Given a 360$^\circ$ panoramic image and its saliency map, the Glance network extracts a global feature vector. At each step $t$, the hierarchical sampler selects a candidate fixation from the saliency map, the Focus network extracts a local patch feature, and the combined feature is processed by the Mamba sequence model to predict the next fixation coordinate.}
   \label{fig:architecture}
 \end{figure*}
@@ -164,15 +155,15 @@ Given a 360$^\circ$ panoramic image $\mathbf{I} \in \mathbb{R}^{3 \times H \time
 
 \subsection{Glance Network}
 The Glance network $\mathcal{G}$ extracts a global scene representation from the full panoramic image. A global context vector is essential because human observers form an initial holistic impression of a scene before directing attention to specific regions—a phenomenon known as the ``gist'' of a scene. The Glance network consists of a convolutional encoder with two CoordAttention modules inserted after the second and third convolutional blocks:
+ 
 
 \begin{figure}[t]
   \centering
-  \includegraphics[width=\linewidth]{figures/coordatt.pdf}
-  % TODO: 替换为实际 CoordAttention 模块图
-  \fbox{\parbox{0.9\linewidth}{\centering\vspace{2.2cm}[Figure 3: CoordAttention module. Horizontal and vertical 1D pooling branches produce direction-aware attention weights $a_h$ and $a_w$, which are multiplied with the input feature map.]\vspace{2.2cm}}}
+  \includegraphics[width=0.9\linewidth]{figures/coordatt.pdf}
   \caption{Illustration of the CoordAttention module. The feature map is pooled along the height ($\leftrightarrow$, azimuth) and width ($\updownarrow$, elevation) axes independently, projected through a shared Conv1$\times$1, then split to produce per-direction attention weights $a_h$ and $a_w$.}
   \label{fig:coordatt}
 \end{figure}
+
 \begin{equation}
   \mathbf{g} = \mathcal{G}(\mathbf{I}) \in \mathbb{R}^{d}
 \end{equation}
@@ -193,8 +184,6 @@ Human visual exploration follows a well-documented hierarchical pattern: early f
 \begin{figure}[t]
   \centering
   \includegraphics[width=\linewidth]{figures/sampler.pdf}
-  % TODO: 替换为实际分层采样示意图
-  \fbox{\parbox{0.9\linewidth}{\centering\vspace{2.5cm}[Figure 4: Hierarchical sampling strategy. Phase 1 (left, blue): broad random exploration across the full panorama. Phase 2 (right, orange): saliency-guided refinement concentrated on salient regions. Timeline bar shows the 40/60 phase split.]\vspace{2.5cm}}}
   \caption{Illustration of the hierarchical saliency-guided sampling strategy. In Phase~1 ($t < 0.4T$, $\epsilon=0.60$), fixations spread broadly across the panorama. In Phase~2 ($t \geq 0.4T$, $\epsilon=0.30$), sampling concentrates on high-saliency regions. Momentum smoothing produces physically plausible gaze transitions between consecutive fixations.}
   \label{fig:sampler}
 \end{figure}
@@ -339,9 +328,7 @@ Table~\ref{tab:ablation} presents the ablation results. We analyze each componen
 \begin{figure}[t]
   \centering
   \includegraphics[width=\linewidth]{figures/ablation.pdf}
-  % TODO: 替换为 plot_ablation.py 生成的图（ablation_figure.pdf）
-  \fbox{\parbox{0.9\linewidth}{\centering\vspace{3cm}[Figure 5: Ablation study visualization. 3$\times$4 bar chart grid showing DTW, LEV, and REC across four datasets for each model variant. Gold star marks the best result per cell.]\vspace{3cm}}}
-  \caption{Ablation study results across all four datasets and three metrics. Each group of bars corresponds to one model variant (mean $\pm$ std over 3 runs). ★ marks the best-performing variant per dataset--metric combination.}
+  \caption{Ablation study results across all four datasets and three metrics. Each group of bars corresponds to one model variant (mean $\pm$ std over 3 runs). * marks the best-performing variant per dataset--metric combination.}
   \label{fig:ablation}
 \end{figure}
 
