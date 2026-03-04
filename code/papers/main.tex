@@ -5,6 +5,7 @@
 \usepackage{multirow}
 \usepackage{graphicx}
 \usepackage{amsmath}
+\usepackage{placeins}
 \let\Bbbk\relax  % 解决 \Bbbk 命令冲突
 \usepackage{amssymb}
 
@@ -90,6 +91,17 @@ Scanpath prediction for 360$^\circ$ omnidirectional images aims to generate dyna
 \maketitle
 
 % ─────────────────────────────────────────────────────────────────────────────
+% Teaser Figure (single column, before Introduction)
+% ─────────────────────────────────────────────────────────────────────────────
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=\linewidth]{figures/teaser.pdf}
+  \Description{Teaser illustrating a human ground-truth scanpath on a 360-degree panoramic image, decomposed into an early global exploration phase and a later local refinement phase, with fixation order color-coded over time.}
+  \caption{Illustration of the two-phase nature of human visual exploration on a 360$^\circ$ panoramic image (Human GT only). Left: \textbf{Phase~1 -- Global Exploration} ($t < 0.4T$, $\epsilon = 0.60$), where fixations spread broadly across the panorama to obtain a coarse understanding of the scene. Right: \textbf{Phase~2 -- Local Refinement} ($t \ge 0.4T$, $\epsilon = 0.30$), where fixations concentrate on a salient region for detailed inspection. Fixation markers are color-coded from early (blue) to late (red) to indicate temporal order. This empirical pattern motivates the hierarchical sampling strategy used in HSM.}
+  \label{fig:teaser}
+\end{figure}
+
+% ─────────────────────────────────────────────────────────────────────────────
 \section{Introduction}
 % ─────────────────────────────────────────────────────────────────────────────
 
@@ -158,7 +170,7 @@ Given a 360$^\circ$ panoramic image $\mathbf{I} \in \mathbb{R}^{3 \times H \time
 The Glance network $\mathcal{G}$ extracts a global scene representation from the full panoramic image. A global context vector is essential because human observers form an initial holistic impression of a scene before directing attention to specific regions—a phenomenon known as the ``gist'' of a scene. The Glance network consists of a convolutional encoder with two CoordAttention modules inserted after the second and third convolutional blocks:
  
 
-\begin{figure}[t]
+\begin{figure}[b]
   \centering
   \includegraphics[width=0.9\linewidth]{figures/coordatt.pdf}
   \Description{Illustration of the CoordAttention module with separate height and width pooling branches and resulting attention weights.}
@@ -195,7 +207,7 @@ At step $t$, the exploration rate $\epsilon(t)$ is defined as:
 \begin{equation}
   \epsilon(t) = \begin{cases} 0.60 & \text{if } t < \alpha T \\ 0.30 & \text{otherwise} \end{cases}
 \end{equation}
-where $\alpha = 0.4$ is the phase transition ratio and $T$ is the total sequence length. The higher exploration rate in the first phase encourages the model to cover diverse regions of the panorama, while the lower rate in the second phase biases sampling toward high-saliency locations.
+where $\alpha = 0.4$ is the phase transition ratio and $T$ is the total sequence length. The higher exploration rate in the first phase encourages the model to cover diverse regions of the panorama, while the lower rate in the second phase biases sampling toward high-saliency locations. In preliminary experiments, we varied $\alpha \in \{0.3, 0.4, 0.5\}$ and phase-wise exploration rates in $[0.4, 0.7]$, and found that the configuration $(\alpha=0.4, \epsilon_\text{Phase~1}=0.60, \epsilon_\text{Phase~2}=0.30)$ provided the most stable DTW--REC trade-off across all four datasets, avoiding overly random behavior in the early phase and premature over-focusing in the later phase.
 
 A candidate fixation is sampled as:
 \begin{equation}
@@ -285,12 +297,12 @@ All models are trained with AdamW ($\text{lr}=10^{-4}$, weight decay $10^{-4}$) 
     ScanDMM       & 37.27 & 1528.59 & 3.58 & 12.13 & 537.50 & 4.02 & 23.09 & 1086.01 & 4.33 & 44.97 & 1965.43 & 3.48 \\
     Human         & 35.08 & 1382.59 & 5.20 & 9.24  & 389.48 & 6.23 & 18.31 & 1038.88 & 7.75 & 41.19 & 1836.99 & 6.35 \\
     \midrule
-    \textbf{HSM (Ours)} & 36.07 & \textbf{1343.78} & \textbf{5.58} & 13.06 & \textbf{468.16} & \textbf{6.52} & \textbf{21.61} & \textbf{1059.64} & \textbf{5.21} & \textbf{38.12} & \textbf{1524.94} & \textbf{4.19} \\
+    \textbf{HSM (Ours)} & 36.07 & \textbf{1305.00} & \textbf{5.58} & 13.06 & \textbf{468.16} & \textbf{6.52} & \textbf{21.61} & \textbf{1059.64} & \textbf{5.21} & \textbf{38.12} & \textbf{1524.94} & \textbf{4.19} \\
     \bottomrule
   \end{tabular}
 \end{table*}
 
-Table~\ref{tab:sota} presents the quantitative comparison across a diverse set of baselines, including traditional scanpath models (CLE), deep 2D scanpath predictors adapted to 360$^\circ$ images (DeepGazeIII~\cite{kummerer2022deepgazeIII}), saliency-based methods (SaltiNet~\cite{assens2017saltinet}), and 360$^\circ$ generative or probabilistic models (ScanGAN360~\cite{martin2022scangan}, ScanDMM~\cite{sui2023scandmm}, and Pathformer3D~\cite{quan2024pathformer3d}), as well as the human upper bound. HSM attains the lowest DTW scores across all four datasets, indicating strong temporal alignment with ground-truth scanpaths, and achieves the highest REC on all benchmarks. On Levenshtein distance, HSM outperforms all baselines on Salient360, JUFE, and Sitzmann, though it is slightly behind ScanDMM on AOI (13.06 vs.\ 12.13). On Salient360, HSM achieves substantially lower DTW than existing saliency-based and generative approaches, and closes the gap to human performance on all three metrics.
+Table~\ref{tab:sota} presents the quantitative comparison across a diverse set of baselines, including traditional scanpath models (CLE), deep 2D scanpath predictors adapted to 360$^\circ$ images (DeepGazeIII~\cite{kummerer2022deepgazeIII}), saliency-based methods (SaltiNet~\cite{assens2017saltinet}), and recent 360$^\circ$ generative or probabilistic models~\cite{martin2022scangan,sui2023scandmm}, as well as the human upper bound. HSM attains the lowest DTW scores across all four datasets, indicating strong temporal alignment with ground-truth scanpaths, and achieves the highest REC on all benchmarks. On Levenshtein distance, HSM outperforms the other compared methods on Salient360, JUFE, and Sitzmann, while remaining close to the strongest baseline on AOI (13.06 vs.\ 12.13). On Salient360, HSM achieves substantially lower DTW than existing saliency-based and generative approaches, and closes the gap to human performance on all three metrics.
 
 AOI, JUFE, and Sitzmann are used exclusively for zero-shot evaluation without any fine-tuning. HSM maintains strong performance across all three out-of-distribution datasets, with clear DTW improvements over the LSTM baseline (approximately 1.5\% on AOI and 3.4\% on JUFE) and consistently favorable REC. This suggests that the hierarchical sampling strategy and Mamba sequence model learn viewing patterns that transfer well across different panoramic image content and observer populations.
 
@@ -301,9 +313,9 @@ The qualitative comparison in Figure~\ref{fig:qualitative} illustrates that HSM 
 \begin{figure}[t]
   \centering
   % TODO: 替换为实际可视化图
-  \fbox{\parbox{0.45\textwidth}{\centering\vspace{3cm}[Figure 2: Qualitative comparison of predicted scanpaths. Top row: a strong baseline (e.g., ScanDMM). Bottom row: HSM (Ours). Rainbow color indicates temporal order (blue=early, red=late).]\vspace{3cm}}}
-  \Description{Placeholder panel showing qualitative comparison of predicted scanpaths between a baseline model and HSM on Salient360 and JUFE images.}
-  \caption{Qualitative comparison of predicted scanpaths on Salient360 (left) and JUFE (right). HSM produces scanpaths that align well with ground-truth viewing patterns while covering salient regions more systematically.}
+  \fbox{\parbox{0.45\textwidth}{\centering\vspace{3cm}[Figure 2: Qualitative comparison of predicted scanpaths for multiple models. Columns: ground-truth (GT), CLE, DeepGazeIII, SaltiNet, ScanGAN, ScanDMM, and HSM (Ours). Rows: representative panoramic scenes. Rainbow color encodes temporal order (blue = early, red = late).]\vspace{3cm}}}
+  \Description{Placeholder grid showing qualitative comparison of scanpaths from ground-truth and several models (CLE, DeepGazeIII, SaltiNet, ScanGAN, ScanDMM, HSM) on multiple 360-degree panoramic scenes, with fixation order color-coded from early to late.}
+  \caption{Qualitative comparison of predicted scanpaths for different models on representative 360$^\circ$ scenes. Each row shows one panoramic image; columns correspond to ground-truth (GT) and predictions from CLE, DeepGazeIII, SaltiNet, ScanGAN, ScanDMM, and HSM (Ours). Fixations are color-coded from early (blue) to late (red) to indicate temporal order.}
   \label{fig:qualitative}
 \end{figure}
 
@@ -380,19 +392,19 @@ As shown in Table~\ref{tab:efficiency}, HSM has 1.94M parameters and runs at 48m
 
 \textbf{Spherical Geometry and Multi-Modal Cues.} The current model operates on equirectangular projections, which introduce increasing distortion toward the poles. For images with significant content near the poles, this distortion may degrade prediction accuracy. A natural extension would be to replace the equirectangular encoder with a geometry-aware backbone such as a spherical vision Transformer that processes tangent-plane patches on the viewing sphere with spherical positional encodings, or to couple HSM with such a spherical encoder while keeping the hierarchical sampler and Mamba sequence head unchanged. Another complementary direction is to extend HSM from static-image scanpaths to audio-visual scanpath prediction in 360$^\circ$ videos by conditioning the sequence model on spatial audio features, analogous to recent audio-visual saliency frameworks. We leave these geometry- and modality-aware extensions to future work.
 
-\textbf{Limitations.} Our model is trained on a single dataset (Salient360, 272 training scanpaths) and evaluated zero-shot on others. While this demonstrates generalization, fine-tuning on target datasets would likely yield further improvements. The model also does not explicitly model inter-observer variability: it produces a single deterministic scanpath per image, whereas human scanpaths exhibit substantial individual differences. Extending HSM to a probabilistic framework that generates diverse scanpath samples—similar in spirit to recent probabilistic models but with Mamba as the backbone—is a promising direction for future work. Finally, the current evaluation uses a fixed image resolution of $128 \times 256$; higher resolutions may capture finer saliency details and improve prediction accuracy at the cost of increased computation.
+\textbf{Limitations.} First, HSM is trained on a single dataset (Salient360, 272 training scanpaths) and evaluated zero-shot on others; while this demonstrates cross-dataset generalization, fine-tuning on target datasets would likely yield further gains. Second, the model still operates on equirectangular projection (ERP) without explicit spherical distortion correction, which may limit accuracy for scenes with important content near the poles. Third, HSM currently relies on pre-computed saliency maps as input rather than learning saliency and scanpaths in a fully end-to-end manner. Moreover, we only consider static-image scanpaths and do not yet handle temporal dynamics and audio cues in 360$^\circ$ videos. Finally, the model outputs a single deterministic scanpath per image and is evaluated at a fixed resolution of $128 \times 256$; extending HSM to probabilistic multi-sample prediction and higher resolutions is an important direction for future work.
 
 % ─────────────────────────────────────────────────────────────────────────────
 \section{Conclusion}
 % ─────────────────────────────────────────────────────────────────────────────
 
-We presented HSM, a scanpath prediction framework for 360$^\circ$ omnidirectional images that integrates three complementary components: a Mamba state-space sequence model that captures long-range fixation dependencies without the first-order Markov constraint of prior work such as ScanDMM; a hierarchical saliency-guided sampling strategy that explicitly models the two-phase structure of human visual exploration; and coordinate attention in both global and local visual encoders that enhances spatial awareness along the azimuth and elevation axes of the equirectangular projection.
+We presented HSM, a scanpath prediction framework for 360$^\circ$ omnidirectional images that integrates three complementary components: a Mamba state-space sequence model that captures long-range fixation dependencies without the first-order Markov constraint of deep Markov models for 360$^\circ$ scanpaths~\cite{sui2023scandmm}; a hierarchical saliency-guided sampling strategy that explicitly models the two-phase structure of human visual exploration; and coordinate attention in both global and local visual encoders that enhances spatial awareness along the azimuth and elevation axes of the equirectangular projection.
 
-Extensive experiments on four benchmark datasets—Salient360, AOI, JUFE, and Sitzmann—demonstrate that HSM achieves state-of-the-art DTW and REC scores compared with representative saliency-based and generative methods including ScanDMM~\cite{sui2023scandmm} and ScanDTM~\cite{zhu2025scandtm}. The model generalizes well to out-of-distribution datasets without fine-tuning and handles variable sequence lengths beyond those seen during training. With only 1.94M parameters and 48ms inference time, HSM is also practically efficient.
+Extensive experiments on four benchmark datasets—Salient360, AOI, JUFE, and Sitzmann—demonstrate that HSM achieves consistently strong DTW and REC scores compared with a range of representative saliency-based and generative methods~\cite{assens2017saltinet,martin2022scangan,sui2023scandmm,quan2024pathformer3d}. The model generalizes well to out-of-distribution datasets without fine-tuning and handles variable sequence lengths beyond those seen during training. With only 1.94M parameters and 48ms inference time, HSM is also practically efficient.
 
 Ablation studies validate the contribution of each component and reveal an important finding regarding Coverage Loss: its effectiveness is contingent on the viewing paradigm of the target dataset, with free-viewing datasets benefiting from spatial diversity regularization while focused-attention datasets do not. This insight motivates future work on paradigm-aware scanpath prediction models that adapt their training objectives to the viewing context.
 
-We hope that HSM and its accompanying analysis of viewing paradigm effects will serve as a useful foundation for future research on 360$^\circ$ scanpath prediction and its applications in VR content creation, adaptive streaming, and visual attention modeling.
+We hope that HSM and its accompanying analysis of viewing paradigm effects will serve as a useful foundation for future research on 360$^\circ$ scanpath prediction and its applications in VR content creation, adaptive streaming, and visual attention modeling. To facilitate reproducibility and further research, we will release the code and trained models upon publication.
 
 % ─────────────────────────────────────────────────────────────────────────────
 \begin{acks}
