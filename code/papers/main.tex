@@ -88,18 +88,18 @@ Scanpath prediction for 360$^\circ$ omnidirectional images aims to generate dyna
 
 \keywords{scanpath prediction, 360 degrees omnidirectional images, Mamba, hierarchical sampling, coordinate attention, saliency, eye tracking}
 
-\maketitle
-
 % ─────────────────────────────────────────────────────────────────────────────
-% Teaser Figure (single column, before Introduction)
+% Teaser Figure (two-column, top of first page)
 % ─────────────────────────────────────────────────────────────────────────────
-\begin{figure}[t]
+\begin{teaserfigure}
   \centering
-  \includegraphics[width=\linewidth]{figures/teaser.pdf}
+  \includegraphics[width=\textwidth]{figures/teaser.pdf}
   \Description{Teaser illustrating a human ground-truth scanpath on a 360-degree panoramic image, decomposed into an early global exploration phase and a later local refinement phase, with fixation order color-coded over time.}
   \caption{Illustration of the two-phase nature of human visual exploration on a 360$^\circ$ panoramic image (Human GT only). Left: \textbf{Phase~1 -- Global Exploration} ($t < 0.4T$, $\epsilon = 0.60$), where fixations spread broadly across the panorama to obtain a coarse understanding of the scene. Right: \textbf{Phase~2 -- Local Refinement} ($t \ge 0.4T$, $\epsilon = 0.30$), where fixations concentrate on a salient region for detailed inspection. Fixation markers are color-coded from early (blue) to late (red) to indicate temporal order. This empirical pattern motivates the hierarchical sampling strategy used in HSM.}
   \label{fig:teaser}
-\end{figure}
+\end{teaserfigure}
+
+\maketitle
 
 % ─────────────────────────────────────────────────────────────────────────────
 \section{Introduction}
@@ -224,7 +224,7 @@ An auxiliary coverage loss encourages the predicted scanpath to spatially cover 
 \begin{equation}
   \mathcal{L}_{\text{cov}} = -\frac{1}{2}\left(2w_x\,\frac{\sigma_x + r_x}{2} + w_y\,\frac{\sigma_y + r_y}{2}\right)
 \end{equation}
-where $\sigma_x, r_x$ are the standard deviation and range of predicted $x$-coordinates across the sequence, and $w_x=2.0$, $w_y=1.0$ reflect the wider horizontal extent of panoramic images. The total loss is:
+where $\sigma_x, r_x$ are the standard deviation and range of predicted $x$-coordinates across the sequence, and $w_x=2.0$, $w_y=1.0$ reflect the wider horizontal extent of panoramic images: we slightly up-weight horizontal spread to encourage exploration along the azimuth, which spans twice the angular range of the elevation axis in equirectangular projection. The total loss is:
 \begin{equation}
   \mathcal{L} = \mathcal{L}_{\text{path}} + \lambda\,\mathcal{L}_{\text{cov}}, \quad \lambda = 0.05
 \end{equation}
@@ -238,13 +238,13 @@ Teacher forcing with exponential decay ($r_t = 0.8 \times 0.95^t$) is used durin
 \subsection{Datasets}
 We evaluate on four 360$^\circ$ scanpath datasets:
 
-\textbf{Salient360}: 85 equirectangular images with free-viewing scanpaths from multiple observers. We use the official train/test split (272/17 images after per-scanpath expansion), with sequence length $T=25$.
+\textbf{Salient360}: 85 equirectangular images with free-viewing scanpaths from multiple observers. We use the official train/test split (272/17 images after per-scanpath expansion), with sequence length $T=25$. Images are used in their original equirectangular format and only resized to $128 \times 256$ for training and evaluation.
 
-\textbf{AOI}: 384 panoramic images with 9-fixation scanpaths. Used as a cross-dataset generalization test.
+\textbf{AOI}: 384 panoramic images with 9-fixation scanpaths. Used as a cross-dataset generalization test. We follow the original protocol and treat all scanpaths as free-viewing sequences, applying only resolution normalization to $128 \times 256$.
 
-\textbf{JUFE}: 1800 panoramic images with 15-fixation scanpaths recorded in a focused-attention paradigm. Scanpaths are provided in 3D spherical coordinates and converted to normalized equirectangular coordinates.
+\textbf{JUFE}: 1800 panoramic images with 15-fixation scanpaths recorded in a focused-attention paradigm. Scanpaths are provided in 3D spherical coordinates and converted to normalized equirectangular coordinates via the standard sphere-to-ERP mapping: for a unit direction vector $(x,y,z)$ we compute longitude $\phi = \text{atan2}(x,z)$ and latitude $\theta = \arcsin(y)$, then normalize $(\phi,\theta)$ linearly to $[0,1]^2$. The same mapping is used at training and evaluation time to ensure consistency between datasets.
 
-\textbf{Sitzmann}: 48 high-resolution panoramic images with 30-fixation scanpaths. Used to evaluate performance on longer sequences.
+\textbf{Sitzmann}: 48 high-resolution panoramic images with 30-fixation scanpaths. Used to evaluate performance on longer sequences. Original images are high-resolution equirectangular panoramas; we downsample them to $128 \times 256$ using bilinear interpolation without additional cropping, so that all datasets share the same input resolution.
 
 \subsection{Evaluation Metrics}
 We adopt three standard scanpath metrics:
@@ -258,7 +258,7 @@ We adopt three standard scanpath metrics:
 These sequence-based metrics are widely used to assess scanpath similarity and saliency models~\cite{fahimi2021scanpathmetrics,bylinskii2019metrics,kummerer2015infotheoretic}.
 
 \subsection{Implementation Details}
-All models are trained with AdamW ($\text{lr}=10^{-4}$, weight decay $10^{-4}$) for 50 epochs with cosine annealing. Batch size is 128. Images are resized to $128 \times 256$. Training uses the Salient360 training split only; all other datasets are used for evaluation without fine-tuning. All experiments are run on a single NVIDIA GPU.
+All models are implemented in PyTorch and trained with AdamW ($\text{lr}=10^{-4}$, weight decay $10^{-4}$) for 50 epochs with cosine annealing. Batch size is 128. Images from all datasets are resized to $128 \times 256$ using bilinear interpolation. Training uses the Salient360 training split only; all other datasets are used for evaluation without fine-tuning. All experiments are run on a single NVIDIA GPU. The full training and evaluation scripts, together with detailed environment and dependency specifications, will be released with the code to facilitate exact reproducibility.
 
 \subsection{Comparison with State-of-the-Art}
 
@@ -284,7 +284,7 @@ All models are trained with AdamW ($\text{lr}=10^{-4}$, weight decay $10^{-4}$) 
   \end{tabular}
 \end{table*}
 
-Table~\ref{tab:sota} presents the quantitative comparison across a diverse set of baselines, including traditional scanpath models (CLE), deep 2D scanpath predictors adapted to 360$^\circ$ images (DeepGazeIII~\cite{kummerer2022deepgazeIII}), saliency-based methods (SaltiNet~\cite{assens2017saltinet}), and recent 360$^\circ$ generative or probabilistic models~\cite{martin2022scangan,sui2023scandmm}, as well as the human upper bound. HSM attains the lowest DTW scores across all four datasets, indicating strong temporal alignment with ground-truth scanpaths, and achieves the highest REC on all benchmarks. On Salient360, HSM reduces DTW by 14.6\% over ScanDMM (1305.00 vs.\ 1528.59) and narrows the gap to the human upper bound to 5.6\%. On Levenshtein distance, HSM outperforms all baselines on Salient360, JUFE, and Sitzmann; it is slightly behind ScanDMM on AOI (13.06 vs.\ 12.13), which we attribute to AOI's shorter sequences ($T{=}9$) where ScanDMM's saliency-based initialization provides a stronger prior—an advantage that diminishes for longer sequences.
+Table~\ref{tab:sota} presents the quantitative comparison across a diverse set of baselines, including traditional scanpath models (CLE), deep 2D scanpath predictors adapted to 360$^\circ$ images (DeepGazeIII~\cite{kummerer2022deepgazeIII}), saliency-based methods (SaltiNet~\cite{assens2017saltinet}), and recent 360$^\circ$ generative or probabilistic models~\cite{martin2022scangan,sui2023scandmm}, as well as the human upper bound. HSM attains the lowest DTW scores across all four datasets, indicating strong temporal alignment with ground-truth scanpaths, and achieves the highest REC on all benchmarks. On Salient360, HSM reduces DTW by 14.6\% over ScanDMM (1305.00 vs.\ 1528.59) and narrows the gap to the human upper bound to 5.6\%. On Levenshtein distance, HSM outperforms all baselines on Salient360, JUFE, and Sitzmann; it is slightly behind ScanDMM on AOI (13.06 vs.\ 12.13), which we attribute to AOI's shorter sequences ($T{=}9$) where ScanDMM's saliency-based initialization provides a stronger prior—an advantage that diminishes for longer sequences. We also note that the recent ScanDTM model~\cite{zhu2025scandtm} combines a Dual-GCN encoder with a diffusion-based saliency generator that is substantially heavier than our Mamba-based head and, to the best of our knowledge, currently has no public implementation. For this reason we restrict our empirical comparison to methods with available code or widely used re-implementations, and instead discuss ScanDTM conceptually in Related Work and Discussion.
 
 AOI, JUFE, and Sitzmann are used exclusively for zero-shot evaluation without any fine-tuning. HSM maintains strong performance across all three out-of-distribution datasets, with DTW improvements over ScanDMM of 12.9\% on AOI and 2.4\% on JUFE, and consistently favorable REC. On Sitzmann, which contains longer sequences ($T{=}30$) than the training set ($T{=}25$), HSM still performs competitively, demonstrating that the model generalizes to sequence lengths beyond those seen during training—an important property for practical deployment.
 
