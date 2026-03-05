@@ -250,6 +250,7 @@ where $\sigma_x, r_x$ are the standard deviation and range of predicted $x$-coor
 Teacher forcing with exponential decay ($r_t = 0.8 \times 0.95^t$) is used during training to stabilize early optimization while gradually transitioning to free-running inference.
 
 % ─────────────────────────────────────────────────────────────────────────────
+\FloatBarrier
 \section{Experiments}
 % ─────────────────────────────────────────────────────────────────────────────
 
@@ -310,14 +311,14 @@ On Sitzmann, which contains longer sequences ($T=30$) than the training set ($T=
 
 The qualitative comparison in Figure~\ref{fig:qualitative} illustrates that HSM produces scanpaths that cover salient regions more systematically, with smoother transitions between fixations and less tendency to cluster in the image center compared to baseline methods.
 
-\begin{figure}[t]
+\begin{figure*}[t]
   \centering
   % TODO: 替换为实际可视化图
-  \fbox{\parbox{0.45\textwidth}{\centering\vspace{3cm}[Figure 2: Qualitative comparison of predicted scanpaths for multiple models. Columns: ground-truth (GT), CLE, DeepGazeIII, SaltiNet, ScanGAN, ScanDMM, and HSM (Ours). Rows: representative panoramic scenes. Rainbow color encodes temporal order (blue = early, red = late).]\vspace{3cm}}}
+  \fbox{\parbox{0.95\textwidth}{\centering\vspace{3cm}[Figure 2: Qualitative comparison of predicted scanpaths for multiple models. Columns: ground-truth (GT), CLE, DeepGazeIII, SaltiNet, ScanGAN, ScanDMM, and HSM (Ours). Rows: representative panoramic scenes. Rainbow color encodes temporal order (blue = early, red = late).]\vspace{3cm}}}
   \Description{Placeholder grid showing qualitative comparison of scanpaths from ground-truth and several models (CLE, DeepGazeIII, SaltiNet, ScanGAN, ScanDMM, HSM) on multiple 360-degree panoramic scenes, with fixation order color-coded from early to late.}
   \caption{Qualitative comparison of predicted scanpaths for different models on representative 360$^\circ$ scenes. Each row shows one panoramic image; columns correspond to ground-truth (GT) and predictions from CLE, DeepGazeIII, SaltiNet, ScanGAN, ScanDMM, and HSM (Ours). Fixations are color-coded from early (blue) to late (red) to indicate temporal order.}
   \label{fig:qualitative}
-\end{figure}
+\end{figure*}
 
 \subsection{Ablation Study}
 \label{sec:ablation}
