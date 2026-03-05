@@ -1,0 +1,618 @@
+{
+  "table_of_contents": [
+    {
+      "title": "CLIPGaze: Zero-Shot Goal-Directed Scanpath\nPrediction Using CLIP",
+      "heading_level": null,
+      "page_id": 0,
+      "polygon": [
+        [
+          78.890625,
+          53.09869384765625
+        ],
+        [
+          533.0294189453125,
+          53.09869384765625
+        ],
+        [
+          533.0294189453125,
+          104.90399169921875
+        ],
+        [
+          78.890625,
+          104.90399169921875
+        ]
+      ]
+    },
+    {
+      "title": "I. INTRODUCTION",
+      "heading_level": null,
+      "page_id": 0,
+      "polygon": [
+        [
+          132.380859375,
+          447.43359375
+        ],
+        [
+          213.37173461914062,
+          447.43359375
+        ],
+        [
+          213.37173461914062,
+          458.4082336425781
+        ],
+        [
+          132.380859375,
+          458.4082336425781
+        ]
+      ]
+    },
+    {
+      "title": "II. METHOD",
+      "heading_level": null,
+      "page_id": 1,
+      "polygon": [
+        [
+          145.828125,
+          368.7613525390625
+        ],
+        [
+          201.45433044433594,
+          368.7613525390625
+        ],
+        [
+          201.45433044433594,
+          378.7239685058594
+        ],
+        [
+          145.828125,
+          378.7239685058594
+        ]
+      ]
+    },
+    {
+      "title": "A. Architecture",
+      "heading_level": null,
+      "page_id": 1,
+      "polygon": [
+        [
+          47.8125,
+          534.05859375
+        ],
+        [
+          111.43946838378906,
+          534.05859375
+        ],
+        [
+          111.43946838378906,
+          547.0523834228516
+        ],
+        [
+          47.8125,
+          547.0523834228516
+        ]
+      ]
+    },
+    {
+      "title": "B. Loss Function",
+      "heading_level": null,
+      "page_id": 2,
+      "polygon": [
+        [
+          47.21484375,
+          237.75
+        ],
+        [
+          120.75,
+          237.75
+        ],
+        [
+          120.75,
+          246.75
+        ],
+        [
+          47.21484375,
+          246.75
+        ]
+      ]
+    },
+    {
+      "title": "III. EXPERIMENTS",
+      "heading_level": null,
+      "page_id": 2,
+      "polygon": [
+        [
+          132.75,
+          527.87109375
+        ],
+        [
+          214.55859375,
+          527.87109375
+        ],
+        [
+          214.55859375,
+          537.0
+        ],
+        [
+          132.75,
+          537.0
+        ]
+      ]
+    },
+    {
+      "title": "A. Implementation Details",
+      "heading_level": null,
+      "page_id": 2,
+      "polygon": [
+        [
+          47.25,
+          669.75
+        ],
+        [
+          157.5,
+          669.75
+        ],
+        [
+          157.5,
+          678.75
+        ],
+        [
+          47.25,
+          678.75
+        ]
+      ]
+    },
+    {
+      "title": "B. Zero-Shot Setting",
+      "heading_level": null,
+      "page_id": 2,
+      "polygon": [
+        [
+          309.0,
+          381.75
+        ],
+        [
+          396.0,
+          381.75
+        ],
+        [
+          396.0,
+          390.97265625
+        ],
+        [
+          309.0,
+          390.97265625
+        ]
+      ]
+    },
+    {
+      "title": "C. Traditional Target Present Setting",
+      "heading_level": null,
+      "page_id": 2,
+      "polygon": [
+        [
+          310.5,
+          657.75
+        ],
+        [
+          465.0,
+          657.75
+        ],
+        [
+          465.0,
+          666.31640625
+        ],
+        [
+          310.5,
+          666.31640625
+        ]
+      ]
+    },
+    {
+      "title": "D. Target Absent Setting",
+      "heading_level": null,
+      "page_id": 3,
+      "polygon": [
+        [
+          47.25,
+          323.25
+        ],
+        [
+          150.75,
+          323.25
+        ],
+        [
+          150.75,
+          333.0
+        ],
+        [
+          47.25,
+          333.0
+        ]
+      ]
+    },
+    {
+      "title": "E. Qualitative Comparison",
+      "heading_level": null,
+      "page_id": 3,
+      "polygon": [
+        [
+          47.513671875,
+          465.99609375
+        ],
+        [
+          161.25,
+          465.99609375
+        ],
+        [
+          161.25,
+          476.25
+        ],
+        [
+          47.513671875,
+          476.25
+        ]
+      ]
+    },
+    {
+      "title": "F. Visual Prompts",
+      "heading_level": null,
+      "page_id": 3,
+      "polygon": [
+        [
+          48.0,
+          595.93359375
+        ],
+        [
+          123.75,
+          595.93359375
+        ],
+        [
+          123.75,
+          606.0
+        ],
+        [
+          48.0,
+          606.0
+        ]
+      ]
+    },
+    {
+      "title": "G. Ablation Study",
+      "heading_level": null,
+      "page_id": 3,
+      "polygon": [
+        [
+          311.25,
+          324.75
+        ],
+        [
+          387.0,
+          324.75
+        ],
+        [
+          387.0,
+          334.5
+        ],
+        [
+          311.25,
+          334.5
+        ]
+      ]
+    },
+    {
+      "title": "IV. CONCLUSION",
+      "heading_level": null,
+      "page_id": 3,
+      "polygon": [
+        [
+          398.25,
+          537.15234375
+        ],
+        [
+          476.25,
+          537.15234375
+        ],
+        [
+          476.25,
+          546.75
+        ],
+        [
+          398.25,
+          546.75
+        ]
+      ]
+    },
+    {
+      "title": "REFERENCES",
+      "heading_level": null,
+      "page_id": 4,
+      "polygon": [
+        [
+          144.931640625,
+          51.35443115234375
+        ],
+        [
+          202.39846801757812,
+          51.35443115234375
+        ],
+        [
+          202.39846801757812,
+          61.3170166015625
+        ],
+        [
+          144.931640625,
+          61.3170166015625
+        ]
+      ]
+    }
+  ],
+  "page_stats": [
+    {
+      "page_id": 0,
+      "text_extraction_method": "pdftext",
+      "block_counts": [
+        [
+          "Span",
+          206
+        ],
+        [
+          "Line",
+          93
+        ],
+        [
+          "Text",
+          10
+        ],
+        [
+          "SectionHeader",
+          2
+        ],
+        [
+          "PageHeader",
+          1
+        ],
+        [
+          "Footnote",
+          1
+        ],
+        [
+          "Picture",
+          1
+        ],
+        [
+          "Caption",
+          1
+        ],
+        [
+          "PageFooter",
+          1
+        ],
+        [
+          "PictureGroup",
+          1
+        ]
+      ],
+      "block_metadata": {
+        "llm_request_count": 0,
+        "llm_error_count": 0,
+        "llm_tokens_used": 0,
+        "previous_text": "",
+        "previous_type": "",
+        "previous_order": 0
+      }
+    },
+    {
+      "page_id": 1,
+      "text_extraction_method": "pdftext",
+      "block_counts": [
+        [
+          "Span",
+          465
+        ],
+        [
+          "Line",
+          119
+        ],
+        [
+          "ListItem",
+          8
+        ],
+        [
+          "ListGroup",
+          3
+        ],
+        [
+          "Caption",
+          2
+        ],
+        [
+          "SectionHeader",
+          2
+        ],
+        [
+          "Text",
+          2
+        ],
+        [
+          "Figure",
+          1
+        ],
+        [
+          "Picture",
+          1
+        ],
+        [
+          "PageFooter",
+          1
+        ],
+        [
+          "FigureGroup",
+          1
+        ],
+        [
+          "PictureGroup",
+          1
+        ]
+      ],
+      "block_metadata": {
+        "llm_request_count": 0,
+        "llm_error_count": 0,
+        "llm_tokens_used": 0,
+        "previous_text": "",
+        "previous_type": "",
+        "previous_order": 0
+      }
+    },
+    {
+      "page_id": 2,
+      "text_extraction_method": "surya",
+      "block_counts": [
+        [
+          "Line",
+          107
+        ],
+        [
+          "TableCell",
+          105
+        ],
+        [
+          "Span",
+          66
+        ],
+        [
+          "Text",
+          10
+        ],
+        [
+          "SectionHeader",
+          5
+        ],
+        [
+          "Caption",
+          2
+        ],
+        [
+          "Table",
+          2
+        ],
+        [
+          "Equation",
+          1
+        ],
+        [
+          "PageFooter",
+          1
+        ],
+        [
+          "TableGroup",
+          1
+        ]
+      ],
+      "block_metadata": {
+        "llm_request_count": 0,
+        "llm_error_count": 0,
+        "llm_tokens_used": 0,
+        "previous_text": "",
+        "previous_type": "",
+        "previous_order": 0
+      }
+    },
+    {
+      "page_id": 3,
+      "text_extraction_method": "surya",
+      "block_counts": [
+        [
+          "TableCell",
+          105
+        ],
+        [
+          "Line",
+          98
+        ],
+        [
+          "Span",
+          32
+        ],
+        [
+          "Text",
+          9
+        ],
+        [
+          "SectionHeader",
+          5
+        ],
+        [
+          "Caption",
+          4
+        ],
+        [
+          "Table",
+          2
+        ],
+        [
+          "Figure",
+          2
+        ],
+        [
+          "TableGroup",
+          2
+        ],
+        [
+          "FigureGroup",
+          2
+        ],
+        [
+          "PageFooter",
+          1
+        ]
+      ],
+      "block_metadata": {
+        "llm_request_count": 0,
+        "llm_error_count": 0,
+        "llm_tokens_used": 0,
+        "previous_text": "",
+        "previous_type": "",
+        "previous_order": 0
+      }
+    },
+    {
+      "page_id": 4,
+      "text_extraction_method": "pdftext",
+      "block_counts": [
+        [
+          "Span",
+          493
+        ],
+        [
+          "Line",
+          146
+        ],
+        [
+          "ListItem",
+          42
+        ],
+        [
+          "ListGroup",
+          2
+        ],
+        [
+          "SectionHeader",
+          1
+        ],
+        [
+          "PageFooter",
+          1
+        ]
+      ],
+      "block_metadata": {
+        "llm_request_count": 0,
+        "llm_error_count": 0,
+        "llm_tokens_used": 0,
+        "previous_text": "",
+        "previous_type": "",
+        "previous_order": 0
+      }
+    }
+  ],
+  "debug_data_path": "debug_data/CLIPGaze"
+}
