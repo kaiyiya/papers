@@ -145,7 +145,24 @@ Our contributions are as follows.
 \end{figure*}
 
 \subsection{Problem Formulation}
-Given a 360$^\circ$ panoramic image $\mathbf{I} \in \mathbb{R}^{3 \times H \times W}$ and its saliency map $\mathbf{S} \in \mathbb{R}^{1 \times H \times W}$, we aim to predict a scanpath $\hat{\mathbf{P}} = \{(\hat{x}_t, \hat{y}_t)\}_{t=1}^{T}$, where each $(\hat{x}_t, \hat{y}_t) \in [0,1]^2$ denotes a normalized fixation coordinate in the equirectangular projection. GazeMamba processes $\mathbf{I}$ and $\mathbf{S}$ through a shared scene encoder to obtain a global context vector, then autoregressively generates fixations by combining this global context with phase-conditioned candidate positions and locally extracted patch features, all decoded through a Mamba state-space model that retains the complete fixation history at each step.
+Given a 360$^\circ$ panoramic image $\mathbf{I} \in \mathbb{R}^{3 \times H \times W}$ and its saliency map $\mathbf{S} \in \mathbb{R}^{1 \times H \times W}$, we aim to predict a scanpath $\hat{\mathbf{P}} = \{(\hat{x}_t, \hat{y}_t)\}_{t=1}^{T}$, where each $(\hat{x}_t, \hat{y}_t) \in [0,1]^2$ denotes a normalized fixation coordinate in the equirectangular projection. We model scanpath generation as sampling from a conditional distribution
+\begin{equation}
+  p_\theta(\hat{\mathbf{P}} \mid \mathbf{I}, \mathbf{S})
+  = \prod_{t=1}^{T} p_\theta(\hat{\mathbf{p}}_t \mid \hat{\mathbf{p}}_{<t}, \mathbf{I}, \mathbf{S}),
+  \label{eq:cond_factorization}
+\end{equation}
+where $\hat{\mathbf{p}}_t = (\hat{x}_t, \hat{y}_t)$ denotes the $t$-th fixation and $\hat{\mathbf{p}}_{<t} = \{\hat{\mathbf{p}}_1,\dots,\hat{\mathbf{p}}_{t-1}\}$ denotes the fixation history. In practice, we first map $(\mathbf{I}, \mathbf{S}, \hat{\mathbf{p}}_{<t})$ into a sequence of latent tokens
+\begin{equation}
+  \mathbf{H}
+  = \bigl(\mathbf{h}_1,\dots,\mathbf{h}_T\bigr)
+  = \Phi_\theta(\mathbf{I}, \mathbf{S}, \hat{\mathbf{p}}_{<1:T}),
+\end{equation}
+where $\Phi_\theta$ denotes the composition of the scene encoder, patch encoder, and HGS. The Mamba decoder then produces a context vector at each step, and the conditional in~\eqref{eq:cond_factorization} can be written as
+\begin{equation}
+  p_\theta(\hat{\mathbf{p}}_t \mid \hat{\mathbf{p}}_{<t}, \mathbf{I}, \mathbf{S})
+  = p_\theta\bigl(\hat{\mathbf{p}}_t \mid \mathrm{Mamba}_\theta(\mathbf{H})_t\bigr).
+\end{equation}
+GazeMamba thus realizes~\eqref{eq:cond_factorization} through a sequence of learned latent representations and content-dependent state-space updates.
 
 \subsection{Scene Encoder}
 The Scene Encoder $\mathcal{G}$ extracts a global panoramic representation from the full equirectangular image. Before directing attention to any specific location, observers rapidly form a holistic impression of the scene layout—the so-called ``gist''—that shapes subsequent fixation decisions. Capturing this scene-level context grounds all subsequent fixation predictions in a coherent global representation. The encoder comprises a lightweight convolutional backbone with two DCA modules inserted after the second and third convolutional stages:
@@ -183,24 +200,33 @@ Human visual exploration of panoramic scenes follows a consistent hierarchical p
   \label{fig:sampler}
 \end{figure}
 
-At step $t$, the phase-conditioned exploration rate $\varepsilon(t)$ is defined as:
+Formally, at step $t$ we draw a phase-conditioned exploration indicator $z_t \in \{0,1\}$:
 \begin{equation}
-  \varepsilon(t) = \begin{cases} \varepsilon_1 = 0.60 & \text{if } t < \alpha T, \\ \varepsilon_2 = 0.30 & \text{otherwise,} \end{cases}
-\end{equation}
-where $\alpha = 0.4$ is the phase transition ratio and $T$ is the total sequence length. Setting $\alpha = 0.4$ places the transition at roughly the same point where the shift from broad to focused exploration is empirically observed in free-viewing studies~\cite{unema2005time}. The elevated rate in Phase~1 prevents premature attentional collapse, while the reduced rate in Phase~2 concentrates fixations on semantically salient regions consistent with ground-truth distributions.
-
-A candidate fixation is sampled as:
-\begin{equation}
-  \mathbf{c}_t = \begin{cases}
-    \mathcal{U}([0,1]^2) & \text{with probability } \varepsilon(t), \\
-    \text{Multinomial}(\mathrm{softmax}(\mathbf{S}/\tau)) & \text{otherwise,}
+  z_t \sim \mathrm{Bernoulli}\bigl(\varepsilon(t)\bigr), \qquad
+  \varepsilon(t) =
+  \begin{cases}
+    \varepsilon_1 & \text{if } t < \alpha T, \\
+    \varepsilon_2 & \text{otherwise,}
   \end{cases}
+  \label{eq:hgs_eps}
 \end{equation}
-where $\tau = 0.12$ is a sharpness temperature that concentrates the saliency distribution around its peaks. Momentum smoothing is applied outside exploration mode to yield physically plausible gaze trajectories:
+where $\alpha = 0.4$ is the phase transition ratio and $T$ is the total sequence length. The elevated exploration rate $\varepsilon_1$ in Phase~1 prevents premature attentional collapse, while the reduced rate $\varepsilon_2$ in Phase~2 concentrates fixations on semantically salient regions consistent with ground-truth distributions.
+
+Conditioned on $z_t$, the candidate fixation $\mathbf{c}_t$ is sampled from a mixture distribution
 \begin{equation}
-  \mathbf{c}_t \leftarrow (1-\mu)\,\mathbf{c}_t + \mu\,(\mathbf{p}_{t-1} + \delta_{t-1} \cdot s_{\max}),
+  p(\mathbf{c}_t \mid \mathbf{S}, \mathbf{p}_{t-1})
+  = \varepsilon(t)\,\mathcal{U}([0,1]^2)
+    + \bigl(1 - \varepsilon(t)\bigr)\,p_{\text{sal}}(\mathbf{c}_t \mid \mathbf{S}, \mathbf{p}_{t-1}),
+  \label{eq:hgs_mixture}
 \end{equation}
-where $\mu = 0.45$ is the momentum coefficient, $\delta_{t-1}$ is the unit direction vector from the preceding step, and $s_{\max} = 0.18$ is the maximum allowable step size. A hard displacement constraint then clamps $\|\mathbf{c}_t - \mathbf{p}_{t-1}\|$ to $s_{\max}$, preventing saccade amplitudes from exceeding the physiologically plausible range.
+where $\mathcal{U}([0,1]^2)$ is a uniform distribution over the normalized panorama and $p_{\text{sal}}$ denotes a saliency-biased kernel obtained from $\mathrm{softmax}(\mathbf{S}/\tau)$ followed by momentum smoothing. Concretely, letting $\tilde{\mathbf{c}}_t$ be a position sampled from the saliency map with temperature $\tau = 0.12$, we update
+\begin{equation}
+  \mathbf{c}_t
+  = (1-\mu)\,\tilde{\mathbf{c}}_t
+    + \mu \bigl(\mathbf{p}_{t-1} + \delta_{t-1} s_{\max}\bigr),
+  \label{eq:hgs_momentum}
+\end{equation}
+where $\mu = 0.45$ is the momentum coefficient, $\delta_{t-1}$ is the unit direction vector of the previous saccade, and $s_{\max} = 0.18$ is the maximum allowable step size. A hard displacement constraint then enforces $\|\mathbf{c}_t - \mathbf{p}_{t-1}\| \le s_{\max}$, preventing saccade amplitudes from exceeding the physiologically plausible range.
 
 \subsection{Mamba Gaze Decoder}
 The sampler provides candidate fixation positions, but the final prediction must integrate global context, local visual content, and full positional history to produce accurate fixation coordinates. At each step $t$, we form a unified feature token by combining the global scene representation, the local patch feature, and a positional encoding of the candidate fixation:
@@ -220,20 +246,40 @@ where $\bar{\mathbf{A}}_t = \exp(\Delta_t \mathbf{A})$ and $\bar{\mathbf{B}}_t =
 \end{equation}
 
 \subsection{Training Objective}
-Standard point-wise regression losses treat fixations independently and are insensitive to the temporal ordering of the sequence. We instead adopt Soft-DTW~\cite{cuturi2017soft}, a differentiable relaxation of dynamic time warping that measures the minimum-cost temporal alignment between predicted and ground-truth sequences:
+Given a training set $\mathcal{D} = \{(\mathbf{I}^{(n)}, \mathbf{S}^{(n)}, \mathbf{P}^{*(n)})\}_{n=1}^{N}$, we minimize the empirical risk
 \begin{equation}
-  \mathcal{L}_{\mathrm{traj}} = \mathrm{SoftDTW}_\gamma(\hat{\mathbf{P}}, \mathbf{P}^*),
+  \mathcal{J}(\theta)
+  = \frac{1}{N} \sum_{n=1}^{N}
+    \Bigl[
+      \mathcal{L}_{\mathrm{traj}}\bigl(\hat{\mathbf{P}}^{(n)}, \mathbf{P}^{*(n)}\bigr)
+      + \lambda\,\mathcal{L}_{\mathrm{cov}}\bigl(\hat{\mathbf{P}}^{(n)}\bigr)
+    \Bigr],
+  \label{eq:empirical_risk}
 \end{equation}
-with smoothing parameter $\gamma = 0.10$. Soft-DTW is robust to small temporal misalignments and provides informative gradients even when predictions are poorly aligned during early training.
+where $\hat{\mathbf{P}}^{(n)}$ is sampled from $p_\theta(\hat{\mathbf{P}} \mid \mathbf{I}^{(n)}, \mathbf{S}^{(n)})$ and $\lambda$ balances trajectory accuracy and coverage.
+
+Standard point-wise regression losses treat fixations independently and are insensitive to temporal ordering. We instead adopt Soft-DTW~\cite{cuturi2017soft}, a differentiable relaxation of dynamic time warping that measures the minimum-cost temporal alignment between predicted and ground-truth sequences:
+\begin{equation}
+  \mathcal{L}_{\mathrm{traj}}(\hat{\mathbf{P}}, \mathbf{P}^*) = \mathrm{SoftDTW}_\gamma(\hat{\mathbf{P}}, \mathbf{P}^*),
+\end{equation}
+with smoothing parameter $\gamma = 0.10$. Writing $\hat{\mathbf{P}} = \{\hat{\mathbf{p}}_i\}_{i=1}^{T}$ and $\mathbf{P}^* = \{\mathbf{p}^*_j\}_{j=1}^{T^*}$, Soft-DTW can be expressed as
+\begin{equation}
+  \mathrm{SoftDTW}_\gamma(\hat{\mathbf{P}}, \mathbf{P}^*)
+  = -\gamma \log \sum_{\boldsymbol{\pi} \in \Pi}
+      \exp\!\left(
+        - \frac{1}{\gamma}
+          \sum_{(i,j) \in \boldsymbol{\pi}}
+            \bigl\|\hat{\mathbf{p}}_i - \mathbf{p}^*_j\bigr\|_2
+      \right),
+\end{equation}
+where $\Pi$ is the set of all monotone alignment paths between the two sequences. The smoothing parameter $\gamma$ controls the sharpness of the soft minimum over paths: as $\gamma \to 0$, $\mathcal{L}_{\mathrm{traj}}$ approaches hard DTW, while larger $\gamma$ yields a smoother objective that still provides informative gradients when predictions are poorly aligned during early training.
 
 An auxiliary panoramic coverage regularizer discourages degenerate solutions in which all predicted fixations collapse to a narrow region of the panorama:
 \begin{equation}
-  \mathcal{L}_{\mathrm{cov}} = -\!\left(w_x\,(\sigma_x + r_x) + w_y\,(\sigma_y + r_y)\right),
+  \mathcal{L}_{\mathrm{cov}}(\hat{\mathbf{P}}) = -\!\left(w_x\,(\sigma_x + r_x) + w_y\,(\sigma_y + r_y)\right),
 \end{equation}
-where $\sigma_x, r_x$ are the standard deviation and range of predicted $x$-coordinates across the sequence, and $w_x=2.0$, $w_y=1.0$ reflect the 2:1 aspect ratio of equirectangular projections. The negative sign means a lower loss corresponds to higher spatial spread, penalizing collapsed trajectories. The total training objective is:
-\begin{equation}
-  \mathcal{L} = \mathcal{L}_{\mathrm{traj}} + \lambda\,\mathcal{L}_{\mathrm{cov}}, \quad \lambda = 0.05.
-\end{equation}
+where $\sigma_x, r_x$ are the standard deviation and range of predicted $x$-coordinates across the sequence, and $w_x=2.0$, $w_y=1.0$ reflect the 2:1 aspect ratio of equirectangular projections. The negative sign means a lower loss corresponds to higher spatial spread, penalizing collapsed trajectories.
+
 Scheduled sampling with exponential decay is used during training: at step $t$, the ground-truth fixation is fed as input with probability $r_t = 0.8 \times 0.95^t$, and the model's own prediction is used otherwise. This curriculum gradually shifts training from full teacher forcing toward free-running inference, preventing the model from becoming dependent on ground-truth context at test time.
 
 % ─────────────────────────────────────────────────────────────────────────────
