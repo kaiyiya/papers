@@ -108,19 +108,19 @@ Predicting where and in what order observers look within 360$^\circ$ omnidirecti
 However, predicting human gaze trajectories—commonly known as \emph{scanpath prediction}—is much more challenging for 360$^\circ$ content. Three factors compound this difficulty. First, the equirectangular projection of a panoramic scene introduces pronounced geometric distortion toward the poles, breaking the translational equivariance that standard convolutional architectures rely upon. Second, observers actively rotate their heads to explore the scene, so the dynamics of fixation are shaped not only by the image content but also by vestibular signals, viewing momentum, and prior exploration history. Third, the resulting scanpaths exhibit strong inter-observer variability and non-stationary statistical structure, with distinct behaviors in the early and late phases of a viewing session~\cite{unema2005time,castelhano2009viewing}—a property that demands a temporal representation capable of retaining the full trajectory context rather than merely conditioning on the most recent fixation.
 
 %-- Current landscape and its gaps --%
-Existing approaches to 360$^\circ$ scanpath prediction fall into two families. \emph{Saliency-based methods}~\cite{assens2017saltinet,lebreton2018gbvs360} generate fixation sequences by sampling from a static or time-varying saliency map. While conceptually simple, these methods are inherently limited by the quality of the underlying saliency estimator and the design of the sampling heuristic. In practice, the temporal dynamics they produce are often physically implausible—characterized by large inter-fixation displacements and sparse coverage of semantically interesting regions, as illustrated in Figure~\ref{fig:teaser}. \emph{Generative methods} address some of these shortcomings by learning to synthesize realistic trajectories from data. GAN-based approaches~\cite{martin2022scangan} produce diverse scanpaths but are prone to training instability and struggle to generate sequences of variable length. ScanDMM~\cite{sui2023scandmm} is a strong recent baseline that frames scanpath prediction as inference in a Deep Markov Model, maintaining a latent visual state $\mathbf{z}_t$ that encodes the evolving attentional landscape. However, the first-order Markov structure of DMM constrains each state transition to depend only on the immediately preceding state $\mathbf{z}_{t-1}$, making it impossible to condition fixation predictions on observations from many steps earlier—a significant limitation given that human inhibition of return operates over multi-fixation timescales. Furthermore, the variational Evidence Lower Bound objective introduces substantial training complexity through KL annealing and posterior approximation. To the best of our knowledge, none of the above methods fully captures the temporal dependency structure of human gaze behavior in panoramic scenes.
+Existing approaches to 360$^\circ$ scanpath prediction fall into two families. \emph{Saliency-based methods}~\cite{assens2017saltinet,lebreton2018gbvs360} generate fixation sequences by sampling from a static or time-varying saliency map. While conceptually simple, these methods are inherently limited by the quality of the underlying saliency estimator and the design of the sampling heuristic. In practice, the temporal dynamics they produce are often physically implausible—characterized by large inter-fixation displacements and sparse coverage of semantically interesting regions, as illustrated in Figure~\ref{fig:teaser}. \emph{Generative methods} address some of these shortcomings by learning to synthesize realistic trajectories from data. GAN-based approaches~\cite{martin2022scangan} produce diverse scanpaths but are prone to training instability and struggle to generate sequences of variable length. ScanDMM~\cite{sui2023scandmm} is a strong recent baseline that frames scanpath prediction as inference in a Deep Markov Model, maintaining a latent visual state $\mathbf{z}_t$ that encodes the evolving attentional landscape. Unfortunately, the first-order Markov structure of DMM constrains each state transition to depend only on the immediately preceding state $\mathbf{z}_{t-1}$, thus making it impossible to condition fixation predictions on observations from many steps earlier—a significant limitation given that human inhibition of return operates over multi-fixation timescales. Furthermore, the variational Evidence Lower Bound objective introduces substantial training complexity through KL annealing and posterior approximation. To the best of our knowledge, none of the above methods fully captures the temporal dependency structure of human gaze behavior in panoramic scenes.
 
 %-- The missing ingredient: two-phase structure --%
 A recurring observation in the eye-tracking literature is that human gaze exploration of novel scenes follows a characteristic \emph{two-phase} progression~\cite{unema2005time}. In the early phase, fixations are broadly distributed, sweeping across the scene to rapidly form a gist-level representation. In the later phase, attention converges toward semantically salient regions for detailed inspection. This global-to-local organization is consistent across observers and scene types, yet no prior scanpath prediction method for 360$^\circ$ images explicitly encodes it as a structural inductive prior, leaving a gap between model assumptions and the actual temporal dynamics of human gaze.
 
-To this end, we propose GazeMamba, a scanpath prediction framework built around three components. The Hierarchical Gaze Sampler divides the fixation sequence into a broad exploration phase and a focused refinement phase, each governed by a distinct sampling policy with phase-specific exploration rates and saliency guidance. Momentum smoothing within each phase encourages physically plausible saccade amplitudes and smooth gaze transitions. Directional Coordinate Attention is applied in both the global panoramic encoder and the local patch encoder. It decomposes spatial attention into independent horizontal and vertical 1D encodings that localize salient content along the azimuth and elevation axes, directions that carry distinct semantic meaning in equirectangular panoramas. A Mamba state-space sequence decoder replaces the first-order Markov chain of prior work with a selective state-space model that conditions each fixation prediction on the full preceding trajectory through content-dependent gating, while retaining linear-time computation instead of the quadratic cost of self-attention. The entire framework is trained end-to-end with a differentiable Soft-DTW sequence alignment loss, avoiding the complexity of variational objectives.
+To this end, we propose GazeMamba, a scanpath prediction framework built around three components. The Hierarchical Gaze Sampler divides the fixation sequence into a broad exploration phase and a focused refinement phase, each governed by a distinct sampling policy with phase-specific exploration rates and saliency guidance. Momentum smoothing within each phase encourages physically plausible saccade amplitudes and smooth gaze transitions. Directional Coordinate Attention is applied in both the global panoramic encoder and the local patch encoder. It decomposes spatial attention into independent horizontal and vertical 1D encodings that localize salient content along the azimuth and elevation axes, directions that carry distinct semantic meaning in equirectangular panoramas. A Mamba state-space sequence decoder replaces the first-order Markov chain of prior methods with a selective state-space model, which conditions each fixation prediction on the full preceding trajectory via content-dependent gating, while retaining linear-time computation instead of the quadratic cost of self-attention. The entire framework is trained end-to-end with a differentiable Soft-DTW sequence alignment loss, avoiding the complexity of variational objectives.
 
 Our contributions are as follows.
 \begin{enumerate}[topsep=2pt,itemsep=2pt]
   \item We propose a \textbf{Hierarchical Gaze Sampler} that explicitly encodes the two-phase structure of human visual exploration in 360$^\circ$ panoramic scenes, combining phase-specific exploration rates with momentum smoothing to produce smooth and spatially diverse gaze trajectories.
   \item We introduce \textbf{Directional Coordinate Attention}, a lightweight attention module that decomposes spatial context into azimuth and elevation encodings, enabling both global and local visual encoders to precisely localize salient content in wide-format equirectangular projections.
   \item We present a \textbf{Mamba-based gaze trajectory decoder} that models long-range fixation dependencies through selective state-space updates, overcoming the first-order Markov bottleneck of existing deep generative scanpath models while maintaining linear inference complexity.
-  \item Extensive experiments on four 360$^\circ$ scanpath benchmarks demonstrate state-of-the-art DTW and REC performance and strong zero-shot generalization across unseen datasets and sequence lengths. In Salient360, GazeMamba improves DTW by \textbf{14.0\%} over the prior state of the art while using $6.3\times$ fewer parameters than the strongest baseline, indicating that accuracy and efficiency can be achieved simultaneously.
+  \item Extensive experiments on four 360$^\circ$ scanpath benchmarks demonstrate state-of-the-art DTW and REC performance and strong zero-shot generalization across unseen datasets and sequence lengths. In Salient360, GazeMamba improves DTW by \textbf{14.0\%} over the previous best method, with only 1.94\,M parameters (a 6.3-fold reduction compared with the strongest baseline), indicating that accuracy and efficiency can be achieved simultaneously.
 \end{enumerate}
 
 \section{Related Work}
@@ -165,7 +165,7 @@ where $\Phi_\theta$ denotes the composition of the scene encoder, patch encoder,
 GazeMamba thus realizes~\eqref{eq:cond_factorization} through a sequence of learned latent representations and content-dependent state-space updates.
 
 \subsection{Scene Encoder}
-The Scene Encoder $\mathcal{G}$ extracts a global panoramic representation from the full equirectangular image. Before directing attention to any specific location, observers rapidly form a holistic impression of the scene layout—the so-called ``gist''—that shapes subsequent fixation decisions. Capturing this scene-level context grounds all subsequent fixation predictions in a coherent global representation. The encoder comprises a lightweight convolutional backbone with two DCA modules inserted after the second and third convolutional stages:
+The Scene Encoder $\mathcal{G}$ extracts a global panoramic representation from the full equirectangular image. Before directing attention to any specific location, observers rapidly form a holistic impression of the scene layout—the so-called ``gist''—that shapes subsequent fixation decisions. Capturing this scene-level context grounds all subsequent fixation predictions in a coherent global representation. The encoder comprises a lightweight convolutional backbone with two Directional Coordinate Attention (DCA) modules~\cite{hou2021coordinate}, adapted to the equirectangular setting, inserted after the second and third convolutional stages:
 
 \begin{figure}[b]
   \centering
@@ -310,7 +310,7 @@ We adopt three established scanpath comparison metrics~\cite{fahimi2021scanpathm
 The \textbf{Human upper bound} in Table~\ref{tab:sota} is computed via leave-one-out cross-observer evaluation: for each scanpath in the test set, one observer's sequence is treated as the ``prediction'' and the mean metric against all remaining observers' sequences on the same image is reported as the upper bound. This provides a principled estimate of inter-observer agreement under the same metrics used for automatic methods.
 
 \subsection{Implementation Details}
-All models are implemented in PyTorch and optimized with AdamW ($\text{lr}=10^{-4}$, weight decay $10^{-4}$) for 50 epochs with cosine annealing. Batch size is 128; images are resized to $128 \times 256$. Training uses the Salient360 training split only (272 scanpath instances); all remaining datasets—including JUFE (1800 images, ${\approx}7\times$ more data)—are evaluated \emph{zero-shot} without any fine-tuning or domain adaptation. This strict zero-shot protocol is intentional: our goal is to assess whether the structural inductive priors encoded by HGS and DCA confer cross-domain generalization, rather than fitting to each benchmark individually. Experiments are conducted on a single GPU (NVIDIA A100). All ablation results are averaged over 3 independent runs with different random seeds (0, 1, 2); run-to-run standard deviations were below $\pm0.4$ on LEV, $\pm35$ on DTW, and $\pm0.35$ on REC across all variants, confirming result stability. Code and trained model checkpoints will be released upon publication.
+All models are implemented in PyTorch and optimized with AdamW (learning rate $10^{-4}$, weight decay $10^{-4}$) for 50 epochs with cosine annealing. The batch size is 128 and images are resized to $128 \times 256$. Training uses only the Salient360 split with 272 scanpath instances; the remaining datasets, including JUFE with 1800 images (approximately $7\times$ more data), are evaluated in a strictly zero-shot setting without any fine-tuning or domain adaptation. This protocol is chosen to assess whether the structural inductive priors encoded by HGS and DCA confer cross-domain generalization, rather than fitting to each benchmark individually. Experiments are conducted on a single NVIDIA A100 GPU. All ablation results are averaged over three independent runs with different random seeds (0, 1, and 2); run-to-run standard deviations are below $\pm 0.4$ on LEV, $\pm 35$ on DTW, and $\pm 0.35$ on REC across all variants, indicating stable results. Code and trained model checkpoints will be released upon publication.
 
 \subsection{Comparison with State-of-the-Art}
 \label{sec:sota}
@@ -340,7 +340,7 @@ All models are implemented in PyTorch and optimized with AdamW ($\text{lr}=10^{-
   \end{tabular}
 \end{table*}
 
-\textbf{Accuracy Comparison.} Table~\ref{tab:sota} reports the quantitative results. Baselines include CLE (Center-biased Location Estimate: fixations sampled from a Gaussian centered at the equirectangular midpoint, capturing the well-documented equator bias~\cite{assens2018scanpath360}), DeepGazeIII, SaltiNet, ScanGAN, ScanDMM, and PathFormer3D. Across all four benchmarks, GazeMamba attains the lowest DTW scores and the highest REC scores among all evaluated methods. On Salient360, DTW improves over the prior best (PathFormer3D: 1515.9) by \textbf{14.0\%} (1305.0), and GazeMamba also achieves the lowest LEV (36.07) among automatic methods, within one edit-distance unit of the human upper bound (35.08). On JUFE, GazeMamba leads on both LEV (21.61) and DTW (1059.6), confirming that the learned viewing strategy transfers to task-driven gaze behavior. On Sitzmann—sequences 20\% longer than training ($T{=}30$ vs.\ $T{=}25$)—GazeMamba achieves the best DTW (1524.9) and REC (4.19), showing that the model handles unseen sequence lengths without degradation. On AOI, GazeMamba ranks first on DTW and REC; its LEV (13.06) trails ScanDMM (12.13) by a small margin, a pattern typical of short-sequence datasets ($T{=}9$) where saliency-initialized baselines benefit from a strong equator bias that is less decisive on longer trajectories.
+\textbf{Accuracy Comparison.} Table~\ref{tab:sota} reports the quantitative results. Baselines include CLE (Center-biased Location Estimate, which samples fixations from a Gaussian centered at the equirectangular midpoint to capture the equator bias~\cite{assens2018scanpath360}), DeepGazeIII, SaltiNet, ScanGAN, ScanDMM, HAT and PathFormer3D. Across all four benchmarks, GazeMamba consistently attains the lowest DTW and the highest REC among all evaluated methods. On Salient360, it improves the DTW metric by a substantial margin over the strongest prior model while also reaching the best LEV among automatic approaches, with performance close to the human upper bound. On JUFE, GazeMamba remains the most accurate method under task-driven viewing, leading both in edit distance and temporal alignment, which indicates that the learned viewing strategy transfers beyond free-viewing data. On Sitzmann, where evaluation sequences are longer than those seen during training, GazeMamba again achieves the best alignment and recurrence scores, demonstrating robust generalization to unseen sequence lengths. On AOI, GazeMamba ranks first on DTW and REC but shows a slightly higher LEV than ScanDMM, a behavior that is consistent with short-sequence datasets in which saliency-initialized baselines benefit disproportionately from the strong equator bias.
 
 \subsection{Qualitative Comparison}
 
@@ -348,7 +348,7 @@ All models are implemented in PyTorch and optimized with AdamW ($\text{lr}=10^{-
   \centering
   \includegraphics[width=\linewidth]{figures/compare.pdf}
   \Description{Grid showing predicted scanpaths from ground-truth and six models across three representative 360-degree panoramic scenes. Fixations are color-coded from early (blue) to late (red), with saccade arcs connecting consecutive fixations.}
-  \caption{Qualitative comparison of predicted gaze trajectories on representative 360$^\circ$ panoramic scenes. Each column corresponds to a method; fixations are color-coded from early (blue) to late (red) with connecting saccade arcs. GazeMamba (rightmost column) exhibits the broad initial sweep followed by focused refinement that characterizes human ground-truth scanpaths, whereas prior methods either scatter fixations randomly (SaltiNet) or cluster fixations in a narrow region (ScanDMM).}
+  \caption{Qualitative comparison of predicted gaze trajectories on representative 360$^\circ$ panoramic scenes. Each column corresponds to a method; fixations are color-coded from early (blue) to late (red) with connecting saccade arcs. GazeMamba (rightmost column) exhibits the broad initial sweep followed by focused refinement that characterizes human ground-truth scanpaths, whereas prior methods either scatter fixations randomly or cluster fixations in a narrow region.}
   \label{fig:qualitative}
 \end{figure*}
 
@@ -357,49 +357,41 @@ Figure~\ref{fig:qualitative} provides a qualitative comparison across representa
 \subsection{Ablation Study}
 \label{sec:ablation}
 
-Table~\ref{tab:ablation} reports the five main ablation variants on
-Salient360 (in-distribution) and JUFE (zero-shot), with three runs each.
+Table~\ref{tab:ablation} reports the five main ablation variants in
+Salient360 and JUFE, with three runs each.
 Figure~\ref{fig:ablation_quant} focuses exclusively on the
 \emph{fine-grained sub-variants} of the DCA and HGS components across
 all four benchmarks, with the Full model shown as a dashed reference line.
-
 \begin{table}[t]
   \centering
-  \caption{%
-    Component ablation on Salient360 and JUFE (zero-shot).
-    Results are mean over 3 independent runs (different random seeds).
-    $\downarrow$: lower is better; $\uparrow$: higher is better.
-    \textbf{Bold}: best per column.
-    $^\dagger$LSTM overfits to the training distribution; see text.
-    $^\ddagger$Bold entries for \emph{w/o Coverage Reg.} on JUFE reflect a
-    dataset-paradigm effect (focused-attention viewing), not a design recommendation;
-    see §\ref{sec:discussion}.}
+  \small
+  \setlength{\tabcolsep}{4pt}
+  \caption{Component ablation on Salient360 and JUFE. Results are means over three runs. $\downarrow$ indicates lower is better; $\uparrow$ indicates higher is better.}
   \label{tab:ablation}
-  \setlength{\tabcolsep}{5pt}
   \begin{tabular}{lcccccc}
     \toprule
-    & \multicolumn{3}{c}{Salient360} & \multicolumn{3}{c}{JUFE (zero-shot)} \\
+    & \multicolumn{3}{c}{Salient360} & \multicolumn{3}{c}{JUFE} \\
     \cmidrule(lr){2-4}\cmidrule(lr){5-7}
     Variant
       & LEV$\downarrow$ & DTW$\downarrow$ & REC$\uparrow$
       & LEV$\downarrow$ & DTW$\downarrow$ & REC$\uparrow$ \\
     \midrule
-    \textbf{Full (GazeMamba)}
-      & $\mathbf{36.12}$ & $\mathbf{1305.0}$ & $\mathbf{5.58}$
-      & $21.40$          & $1019.8$          & $5.21$ \\
+    Full
+      & \textbf{36.12} & \textbf{1305.0} & \textbf{5.58}
+      & 21.40          & 1019.8          & 5.21 \\
     \midrule
     w/o DCA
-      & $36.45$ & $1344.5$ & $5.24$
-      & $22.55$ & $1044.7$ & $4.89$ \\
+      & 36.45 & 1344.5 & 5.24
+      & 22.55 & 1044.7 & 4.89 \\
     w/o HGS
-      & $36.47$ & $1320.5$ & $5.41$
-      & $22.26$ & $1019.3$ & $5.07$ \\
-    w/o Coverage Reg.$^\ddagger$
-      & $36.28$ & $1317.9$ & $5.44$
-      & $\mathbf{20.70}$ & $\mathbf{948.1}$ & $\mathbf{5.43}$ \\
-    LSTM Decoder$^\dagger$
-      & $35.80$ & $1296.9$ & $5.51$
-      & $22.09$ & $1055.9$ & $4.96$ \\
+      & 36.47 & 1320.5 & 5.41
+      & 22.26 & 1019.3 & 5.07 \\
+    w/o Coverage Reg.
+      & 36.28 & 1317.9 & 5.44
+      & 20.70 & 948.1  & 5.43 \\
+    LSTM Decoder
+      & 35.80 & 1296.9 & 5.51
+      & 22.09 & 1055.9 & 4.96 \\
     \bottomrule
   \end{tabular}
 \end{table}
@@ -408,20 +400,13 @@ all four benchmarks, with the Full model shown as a dashed reference line.
   \centering
   \includegraphics[width=\textwidth]{figures/ablation.pdf}
   \Description{%
-    Bar charts showing DTW and REC scores across all four benchmarks for the
-    four DCA and HGS sub-variants. Blue bars show DCA direction decomposition
-    (azimuth-only, elevation-only); orange bars show HGS phase decomposition
-    (Phase-1-only, Phase-2-only). The green dashed line marks the Full
-    GazeMamba baseline for reference. Stars mark the best result per panel.}
+    Bar charts showing DTW and REC scores across all four benchmarks for four sub-variants of DCA and HGS. Blue bars correspond to DCA direction decomposition (azimuth-only and elevation-only), and orange bars correspond to HGS phase decomposition (Phase-1-only and Phase-2-only). The green dashed line marks the Full GazeMamba baseline, and stars indicate the best result in each panel.}
   \caption{%
-    Direction and phase decomposition of DCA and HGS across all four benchmarks
-    (DTW\,$\downarrow$, top row; REC\,$\uparrow$, bottom row).
-    The green dashed line is the Full GazeMamba performance (see Table~\ref{tab:ablation} for exact values).
-    Blue shading groups the two DCA sub-variants; orange shading groups the two HGS sub-variants.
-    Stars mark the best result per panel.
-    Across all benchmarks and metrics: elevation branch $>$ azimuth branch for DCA;
-    two-phase HGS outperforms either single-phase variant,
-    with Phase-1-only yielding the worst REC and Phase-2-only yielding the worst spatial coverage.}
+    Direction and phase decomposition of DCA and HGS across all four benchmarks.
+    The top row reports DTW$\downarrow$ and the bottom row reports REC$\uparrow$.
+    The green dashed line denotes the Full GazeMamba performance (see Table~\ref{tab:ablation} for exact values).
+    Blue shading groups the two DCA sub-variants, and orange shading groups the two HGS sub-variants.
+    Elevation-only consistently outperforms azimuth-only for DCA, and the full two-phase HGS outperforms either single-phase variant: Phase-1-only yields the lowest REC, whereas Phase-2-only suffers from the poorest spatial coverage.}
   \label{fig:ablation_quant}
 \end{figure*}
 
@@ -441,48 +426,23 @@ demonstrating that the two directions capture complementary information
 that cannot be recovered by either branch in isolation.
 
 \textbf{Hierarchical Gaze Sampler.}
-Replacing HGS with a fixed exploration rate raises LEV and DTW consistently
-across all benchmarks (Table~\ref{tab:ablation}), confirming that it is the
-two-phase schedule itself, rather than the average exploration magnitude,
-that is responsible for the gains.
-The phase-decomposition sub-variants in Figure~\ref{fig:ablation_quant}
-clarify the individual roles of each phase.
-Using only Phase~1 ($\varepsilon{=}0.60$ throughout) yields the worst
-REC of any HGS variant: unlimited exploration prevents attentional
-convergence, producing broadly scattered fixations that never focus on
-salient regions.
-Using only Phase~2 ($\varepsilon{=}0.30$ throughout) recovers spatial
-precision but sacrifices panoramic coverage, resulting in lower REC than
-the full model on every benchmark.
-Both single-phase variants remain above the Full model reference line
-in DTW, confirming that the interplay between the two phases is essential.
+Replacing HGS with a fixed exploration rate raises LEV and DTW consistently across all benchmarks, as shown in Table~\ref{tab:ablation}, which confirms that the two-phase schedule itself, rather than the average exploration magnitude, is responsible for the gains.
+The phase-decomposition sub-variants in Figure~\ref{fig:ablation_quant} clarify the individual roles of each phase.
+Using only Phase~1, with exploration rate $\varepsilon_1 = 0.60$ at all steps, yields the worst REC of any HGS variant: unlimited exploration prevents attentional convergence and produces broadly scattered fixations that never focus on salient regions.
+Using only Phase~2, with exploration rate $\varepsilon_2 = 0.30$ at all steps, recovers spatial precision but sacrifices panoramic coverage, resulting in lower REC than the full model on every benchmark.
+Both single-phase variants remain above the full-model reference line in DTW, confirming that the interplay between the two phases is essential.
 
 \textbf{Mamba vs.\ LSTM Decoder.}
-The LSTM decoder appears favorable on Salient360 in isolation
-($^{\dagger}$Table~\ref{tab:ablation}), yet this advantage reverses on every
-zero-shot benchmark (Table~\ref{tab:ablation}, JUFE column; Sitzmann
-results discussed in §\ref{sec:discussion}).
-The gap is especially pronounced on Sitzmann, where sequences are 20\% longer
-than during training, placing additional demand on long-range memory that the
-LSTM's fixed gating cannot sustain.
-The Mamba block's content-dependent selection instead retains only the
-context relevant to each candidate position, providing an implicit
-inhibition-of-return mechanism that transfers consistently across scene
-statistics and sequence lengths.
+The LSTM decoder appears slightly favorable on Salient360 when considered in isolation, but this advantage reverses on all zero-shot benchmarks.
+The gap is especially pronounced on Sitzmann, where evaluation sequences are longer than those seen during training, placing additional demand on long-range memory that the LSTM's fixed gating cannot sustain.
+By contrast, the Mamba block uses content-dependent selection to retain only the context relevant to each candidate fixation, acting as an implicit inhibition-of-return mechanism that transfers consistently across scene statistics and sequence lengths.
 
 \textbf{Panoramic Coverage Regularizer.}
-Removing the coverage term produces a dataset-dependent outcome
-(Table~\ref{tab:ablation}).
-On Salient360, removal raises DTW by $+1.0\%$ ($1305.0{\to}1317.9$) and
-lowers REC from 5.58 to 5.44—confirming that spatial diversity pressure
-aligns with free-viewing ground-truth, even if the gain is modest.
-On JUFE, however, removal improves DTW by $7.0\%$ ($1019.8{\to}948.1$),
-a benchmark collected under a focused-attention paradigm where observers
-deliberately concentrated on task-relevant regions.
-This asymmetry reveals a fundamental tension: the coverage regularizer
-encourages broad spatial exploration, which fits free-viewing behavior but
-penalizes the concentrated trajectories of task-driven gaze.
-This finding is discussed further in Section~\ref{sec:discussion}.
+Removing the coverage term leads to different outcomes across datasets.
+On Salient360, which is collected under a free-viewing protocol, dropping the term slightly degrades DTW and REC, indicating that encouraging spatial diversity aligns with the ground-truth distribution of fixations.
+On JUFE, however, removing the coverage term improves DTW, reflecting the fact that this benchmark is collected under a focused-attention paradigm in which observers deliberately concentrate on task-relevant regions rather than exploring broadly.
+This asymmetry highlights a trade-off: the coverage regularizer is beneficial for free-viewing behavior but can penalize the concentrated trajectories characteristic of task-driven gaze.
+As a result, the weight of this term should be calibrated to the target viewing paradigm, as discussed further in Section~\ref{sec:discussion}.
 
 \subsection{Hyperparameter Sensitivity}
 \label{sec:hyperparam}
@@ -604,10 +564,11 @@ entirely on pre-computed saliency map tensors.
 The LSTM decoder achieves slightly lower DTW on Salient360, the training
 distribution, yet falls behind on every held-out benchmark
 (Table~\ref{tab:ablation}).
-This reversal suggests that the LSTM variant captures more dataset-specific
+This reversal stems from two key differences.
+First, the LSTM variant tends to capture more dataset-specific
 patterns, whereas the Mamba configuration learns representations that
 transfer better across datasets and sequence lengths.
-The Mamba block's content-dependent selection matrices allow the model to
+Second, the Mamba block's content-dependent selection matrices allow the model to
 retain fixation history selectively: at each step, only context relevant to
 the current candidate position updates the hidden state, while irrelevant
 history is attenuated.
